@@ -1,0 +1,14 @@
+.card {
+  display: inline-flex;
+  flex-direction: column;
+  border: 1px solid var(--foreground);
+
+  .title {
+    border-bottom: 1px solid;
+  }
+
+  .title,
+  .body {
+    padding: 0.5rem 0.75rem;
+  }
+}

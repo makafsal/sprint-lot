@@ -1,0 +1,31 @@
+.playersList {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+
+  &.hasScroll {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      white 0%,
+      white 90%,
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      white 0%,
+      white 90%,
+      transparent
+    );
+  }
+}
+
+.playerTickBox {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1rem;
+  font-size: 4rem;
+}
