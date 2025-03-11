@@ -1,14 +1,18 @@
 import { PropsWithChildren } from "react";
 import styles from "./Card.module.css";
 
-export const CardHeader = ({ children }: PropsWithChildren) => {
-  return <div className={styles.title}>{children}</div>;
+interface Card extends PropsWithChildren {
+  className?: string;
+}
+
+export const CardHeader = ({ children, className }: Card) => {
+  return <div className={`${styles.title} ${className}`}>{children}</div>;
 };
 
-export const CardBody = ({ children }: PropsWithChildren) => {
-  return <div className={styles.body}>{children}</div>;
+export const CardBody = ({ children, className }: Card) => {
+  return <div className={`${styles.body} ${className}`}>{children}</div>;
 };
 
-export const Card = ({ children }: PropsWithChildren) => {
-  return <div className={styles.card}>{children}</div>;
+export const Card = ({ children, className }: Card) => {
+  return <div className={`${styles.card} ${className}`}>{children}</div>;
 };

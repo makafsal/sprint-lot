@@ -1,3 +1,4 @@
+.sizeList,
 .playersList {
   display: flex;
   flex-direction: row;
@@ -23,9 +24,56 @@
   }
 }
 
-.playerTickBox {
+.numberCard,
+.playerCard {
+  min-width: 12rem;
+  min-height: 15rem;
+}
+
+.cardBodyAlt {
+  height: 100%;
+  align-content: center;
+}
+
+.numberCard {
+  cursor: pointer;
+}
+
+.numberCard:hover {
+  background-color: var(--foreground);
+  color: var(--background);
+}
+
+.cardContent {
   display: flex;
   justify-content: center;
-  padding: 3rem 1rem;
   font-size: 4rem;
+}
+
+.gameBoard {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid;
+  margin: 2rem 0;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.boardActions {
+  display: inline-flex;
+  gap: 1rem;
+}
+
+.gameData {
+  display: inline-flex;
+  gap: 3rem;
+
+  .gameStatus {
+    opacity: 0.7;
+  }
+}
+
+.checkboxAlt {
+  cursor: default;
 }

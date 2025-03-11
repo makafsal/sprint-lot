@@ -5,6 +5,8 @@
 
   .title {
     border-bottom: 1px solid;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 
   .title,

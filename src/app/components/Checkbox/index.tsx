@@ -3,7 +3,11 @@
 import { useState } from "react";
 import styles from "./checkbox.module.css";
 
-export const Checkbox = () => {
+interface Checkbox {
+  className?: string;
+}
+
+export const Checkbox = ({ className }: Checkbox) => {
   const [check, setCheck] = useState("[ ]");
 
   const toggle = () => {
@@ -15,7 +19,11 @@ export const Checkbox = () => {
   };
 
   return (
-    <span role="button" className={styles.checkbox} onClick={toggle}>
+    <span
+      role="button"
+      className={`${styles.checkbox} ${className}`}
+      onClick={toggle}
+    >
       {check}
     </span>
   );

@@ -24,11 +24,20 @@ export const Header = () => {
   }, []);
 
   const getPageTitle = () => {
-    console.log(pathname);
     if (pathname === "/") {
       return "";
     } else {
       return "SprintLot";
+    }
+  };
+
+  const getButton = () => {
+    if (pathname?.toString()?.includes("/game/")) {
+      return <button>Exit</button>;
+    } else if (formType === "join") {
+      return <button onClick={() => handleSetForm("create")}>Create</button>;
+    } else {
+      return <button onClick={() => handleSetForm("join")}>Join</button>;
     }
   };
 
@@ -44,11 +53,7 @@ export const Header = () => {
         >
           {isClient && state.theme === "dark" ? "[☀️]" : "[🌙]"}
         </button>
-        {formType === "join" ? (
-          <button onClick={() => handleSetForm("create")}>Create</button>
-        ) : (
-          <button onClick={() => handleSetForm("join")}>Join</button>
-        )}
+        {getButton()}
       </menu>
     </header>
   );
