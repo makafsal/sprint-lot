@@ -27,7 +27,7 @@ export const Header = () => {
     if (pathname === "/") {
       return "";
     } else {
-      return "SprintLot";
+      return state.game?.name || "SprintLot";
     }
   };
 

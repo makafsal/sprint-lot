@@ -2,11 +2,30 @@ import { createContext } from "react";
 
 export type Theme = "light" | "dark";
 
-export interface Store {
-  theme: Theme;
+export interface Game {
+  average?: number;
+  created_at?: string;
+  game_id?: string;
+  id?: number;
+  name?: string;
+  owner?: number;
+  status?: "started" | "in_progress" | "done";
 }
 
-type Action = { type: "TOGGLE_THEME" };
+export interface Player {
+  created_at?: string;
+  game?: number;
+  id?: number;
+  name?: string;
+  vote?: number;
+}
+
+export interface Store {
+  theme?: Theme;
+  game?: Game;
+}
+
+type Action = { type: "TOGGLE_THEME" | "UPDATE_GAME"; payload?: Store };
 
 export const defaultState: Store = {
   theme:
@@ -31,6 +50,13 @@ export const appReducer = (state: Store, action: Action): Store => {
       return {
         ...state,
         theme: newTheme
+      };
+
+    case "UPDATE_GAME":
+      console.log(action);
+      return {
+        ...state,
+        game: action.payload?.game
       };
 
     default:

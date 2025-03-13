@@ -1,30 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./checkbox.module.css";
 
 interface Checkbox {
   className?: string;
+  onToggle?: () => void;
+  checked?: boolean;
+  disabled?: boolean;
 }
 
-export const Checkbox = ({ className }: Checkbox) => {
-  const [check, setCheck] = useState("[ ]");
+export const Checkbox = ({
+  className,
+  onToggle,
+  checked,
+  disabled
+}: Checkbox) => {
+  const [check, setCheck] = useState<boolean>(checked || false);
 
   const toggle = () => {
-    setCheck((prev) => {
-      const _check = prev === "[ ]" ? "[x]" : "[ ]";
+    setCheck(!check);
 
-      return _check;
-    });
+    onToggle?.();
   };
+
+  useEffect(() => {
+    setCheck(checked || false);
+  }, [checked]);
 
   return (
     <span
       role="button"
       className={`${styles.checkbox} ${className}`}
-      onClick={toggle}
+      onClick={!disabled ? toggle : undefined}
     >
-      {check}
+      {check ? "[x]" : "[ ]"}
     </span>
   );
 };

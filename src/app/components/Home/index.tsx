@@ -1,5 +1,6 @@
 import { useSearchParams } from "next/navigation";
 import styles from "./Home.module.css";
+import { CreateForm } from "../CreateForm";
 
 export const Home = () => {
   const searchParams = useSearchParams();
@@ -8,20 +9,14 @@ export const Home = () => {
   const getForm = () => {
     if (formType === "join") {
       return (
-        <form className="vertical">
+        <div className="form vertical">
           <input type="text" placeholder="Game ID... *" />
           <input type="text" placeholder="Your Name... *" />
           <button>Join</button>
-        </form>
+        </div>
       );
     } else {
-      return (
-        <form className="vertical">
-          <input type="text" placeholder="Game Name... *" />
-          <input type="text" placeholder="Your Name... *" />
-          <button>Create</button>
-        </form>
-      );
+      return <CreateForm />;
     }
   };
 
