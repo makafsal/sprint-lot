@@ -1,16 +1,12 @@
+import { Player } from "@/app/context/AppCxt";
 import { supabase } from "./supabaseClient";
-
-interface Player {
-  name?: string;
-  game?: number;
-}
 
 const TABLE = "players";
 
-export const createPlayer = async (name: string) => {
+export const createPlayer = async ({ name, game }: Player) => {
   const { data, error } = await supabase
     .from(TABLE)
-    .insert([{ name }])
+    .insert([{ name, game }])
     .select();
 
   if (error) {
@@ -25,7 +21,8 @@ export const updatePlayer = async (playerID: number, payload: Player) => {
   const { data, error } = await supabase
     .from(TABLE)
     .update({ ...payload })
-    .eq("id", playerID);
+    .eq("id", playerID)
+    .select();
 
   if (error) {
     console.error(`Error updating player with ${payload}:`, error);
@@ -47,17 +44,4 @@ export const getAllPlayersByGameID = async (gameId: number) => {
   }
 
   return data; // Return the list of players
-};
-
-export const subscribePlayersAll = async () => {
-  return supabase
-    .channel("custom-all-channel")
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "players" },
-      (payload) => {
-        console.log("Change received!", payload);
-      }
-    )
-    .subscribe();
 };

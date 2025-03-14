@@ -39,6 +39,7 @@
   cursor: pointer;
 }
 
+.numberCard.selected,
 .numberCard:hover {
   background-color: var(--foreground);
   color: var(--background);

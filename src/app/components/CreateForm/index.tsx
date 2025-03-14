@@ -5,16 +5,16 @@ import { useRouter } from "next/navigation";
 
 export const CreateForm = () => {
   const [loading, setLoading] = useState(false);
-  const [game, setGame] = useState("");
-  const [player, setPlayer] = useState("");
+  const [gameName, setGameName] = useState("");
+  const [playerName, setPlayerName] = useState("");
   const router = useRouter();
 
   const onCreate = async () => {
     setLoading(true);
-    if (!game?.trim() || !player?.trim()) return;
+    if (!gameName?.trim() || !playerName?.trim()) return;
 
-    let newPlayer = await createPlayer(player);
-    const newGame = await createGame(game, newPlayer.id);
+    let newPlayer = await createPlayer({ name: playerName });
+    const newGame = await createGame(gameName, newPlayer.id);
     newPlayer = await updatePlayer(newPlayer.id, { game: newGame.id });
 
     // Create session for current user in localStorage
@@ -22,13 +22,13 @@ export const CreateForm = () => {
 
     if (newGame) {
       alert(`Game created: ${newGame.name}`);
-      setTimeout(() => {
-        setLoading(false);
-        setGame("");
-        setPlayer("");
-        router.push(`/game/${newGame.game_id}`);
-      }, 1000);
+
+      router.push(`/game/${newGame.game_id}`);
     }
+
+    setLoading(false);
+    setGameName("");
+    setPlayerName("");
   };
 
   return (
@@ -36,12 +36,12 @@ export const CreateForm = () => {
       <input
         type="text"
         placeholder="Game Name... *"
-        onChange={(ev) => setGame(ev?.target?.value)}
+        onChange={(ev) => setGameName(ev?.target?.value)}
       />
       <input
         type="text"
         placeholder="Your Name..... *"
-        onChange={(ev) => setPlayer(ev?.target?.value)}
+        onChange={(ev) => setPlayerName(ev?.target?.value)}
       />
       <button onClick={() => onCreate()} disabled={loading}>
         Create

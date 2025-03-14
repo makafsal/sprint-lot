@@ -53,7 +53,6 @@ export const appReducer = (state: Store, action: Action): Store => {
       };
 
     case "UPDATE_GAME":
-      console.log(action);
       return {
         ...state,
         game: action.payload?.game

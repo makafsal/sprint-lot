@@ -13,4 +13,14 @@
   .body {
     padding: 0.5rem 0.75rem;
   }
+
+  .selected {
+    background: var(--foreground);
+    color: var(--background);
+  }
+
+  &.disabled {
+    opacity: 0.75;
+    cursor: default;
+  }
 }
