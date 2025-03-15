@@ -17,7 +17,7 @@ export interface Player {
   game?: number;
   id?: number;
   name?: string;
-  vote?: number;
+  vote?: number | null;
 }
 
 export interface Store {

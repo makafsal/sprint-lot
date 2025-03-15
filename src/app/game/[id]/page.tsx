@@ -7,7 +7,11 @@ import { useContext, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getGameByID, updateGame } from "@/lib/game";
 import { AppCxt, Game, Player } from "@/app/context/AppCxt";
-import { getAllPlayersByGameID, updatePlayer } from "@/lib/player";
+import {
+  getAllPlayersByGameID,
+  updateAllPlayersByGameID,
+  updatePlayer
+} from "@/lib/player";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 
@@ -180,6 +184,13 @@ const GamePage = () => {
     }
   };
 
+  const reset = async () => {
+    if (state.game?.id) {
+      await updateGame(state.game?.id, { status: "started" });
+      await updateAllPlayersByGameID(state.game?.id, { vote: null });
+    }
+  };
+
   return (
     <>
       <section className={`${styles.playersList}`}>
@@ -191,7 +202,7 @@ const GamePage = () => {
             <CardBody className={styles.cardBodyAlt}>
               <div className={styles.cardContent}>
                 {state.game?.status === "done" ? (
-                  <>{_player?.vote || '?'}</>
+                  <>{_player?.vote || "?"}</>
                 ) : (
                   <Checkbox
                     className={styles.checkboxAlt}
@@ -207,7 +218,7 @@ const GamePage = () => {
       <section className={styles.gameBoard}>
         <div className={styles.boardActions}>
           <button onClick={() => reveal()}>Reveal</button>
-          <button>Reset</button>
+          <button onClick={() => reset()}>Reset</button>
           <button>Delete</button>
           <button>Invite</button>
         </div>
@@ -226,7 +237,7 @@ const GamePage = () => {
             }`}
             key={size}
             onClick={() => castVote(size)}
-            disabled={state.game?.status === 'done'}
+            disabled={state.game?.status === "done"}
           >
             <CardBody className={styles.cardBodyAlt}>
               <div className={styles.cardContent}>{size}</div>

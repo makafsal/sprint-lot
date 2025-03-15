@@ -45,3 +45,20 @@ export const getAllPlayersByGameID = async (gameId: number) => {
 
   return data; // Return the list of players
 };
+
+export const updateAllPlayersByGameID = async (
+  gameId: number,
+  payload: Player
+) => {
+  const { data, error } = await supabase
+    .from("players")
+    .update({ ...payload })
+    .eq("game", gameId)
+
+  if (error) {
+    console.error("Error resetting votes:", error);
+    return [];
+  }
+
+  return data;
+};
