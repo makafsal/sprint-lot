@@ -186,7 +186,7 @@ const GamePage = () => {
 
   const reset = async () => {
     if (state.game?.id) {
-      await updateGame(state.game?.id, { status: "started" });
+      await updateGame(state.game?.id, { status: "started", average: 0 });
       await updateAllPlayersByGameID(state.game?.id, { vote: null });
     }
   };
