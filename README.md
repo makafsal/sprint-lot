@@ -3,9 +3,10 @@
 A planning poker game for agile teams to estimate ticket sizes collaboratively.
 
 ## Features
+ - Free
  - Minimalistic UI
  - Dark and Light mode
- - Free to use
+ - Easy to use
 
 ## Screenshots
 
