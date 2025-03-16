@@ -2,7 +2,7 @@
 
 import { Card, CardBody, CardHeader } from "@/app/components/Card";
 import { Checkbox } from "@/app/components/Checkbox";
-import styles from "./GamePage.module.css";
+import styles from "./gamePage.module.css";
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { deleteGameByID, getGameByID, updateGame } from "@/lib/game";
