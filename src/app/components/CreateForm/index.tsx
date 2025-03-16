@@ -1,5 +1,5 @@
 import { createGame } from "@/lib/game";
-import { createPlayer, updatePlayer } from "@/lib/player";
+import { createPlayer, updatePlayerByID } from "@/lib/player";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -15,14 +15,13 @@ export const CreateForm = () => {
 
     let newPlayer = await createPlayer({ name: playerName });
     const newGame = await createGame(gameName, newPlayer.id);
-    newPlayer = await updatePlayer(newPlayer.id, { game: newGame.id });
+    newPlayer = await updatePlayerByID(newPlayer.id, { game: newGame.id });
+    console.log(newPlayer)
 
     // Create session for current user in localStorage
     localStorage.setItem("player", JSON.stringify(newPlayer));
 
     if (newGame) {
-      alert(`Game created: ${newGame.name}`);
-
       router.push(`/game/${newGame.game_id}`);
     }
 

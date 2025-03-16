@@ -78,3 +78,7 @@
 .checkboxAlt {
   cursor: default;
 }
+
+.copyButton {
+  margin-left: 0.5rem;
+}

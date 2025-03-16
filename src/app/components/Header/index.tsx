@@ -33,7 +33,7 @@ export const Header = () => {
 
   const getButton = () => {
     if (pathname?.toString()?.includes("/game/")) {
-      return <button>Exit</button>;
+      return;
     } else if (formType === "join") {
       return <button onClick={() => handleSetForm("create")}>Create</button>;
     } else {

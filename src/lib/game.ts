@@ -46,3 +46,18 @@ export const updateGame = async (gameID: number, payload: Game) => {
 
   return data[0];
 };
+
+export const deleteGameByID = async (gameID: number) => {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .delete()
+    .eq("id", gameID)
+    .select();
+
+  if (error) {
+    console.error(`Error deleting game with id ${gameID}:`, error);
+    return false;
+  }
+
+  return data[0];
+};

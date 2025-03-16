@@ -8,7 +8,7 @@ export interface Game {
   game_id?: string;
   id?: number;
   name?: string;
-  owner?: number;
+  owner?: number | null;
   status?: "started" | "in_progress" | "done";
 }
 

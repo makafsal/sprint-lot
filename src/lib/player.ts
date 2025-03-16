@@ -17,7 +17,7 @@ export const createPlayer = async ({ name, game }: Player) => {
   return data[0]; // Return the newly created player object
 };
 
-export const updatePlayer = async (playerID: number, payload: Player) => {
+export const updatePlayerByID = async (playerID: number, payload: Player) => {
   const { data, error } = await supabase
     .from(TABLE)
     .update({ ...payload })
@@ -29,12 +29,12 @@ export const updatePlayer = async (playerID: number, payload: Player) => {
     return null;
   }
 
-  return data;
+  return data[0];
 };
 
 export const getAllPlayersByGameID = async (gameId: number) => {
   const { data, error } = await supabase
-    .from("players")
+    .from(TABLE)
     .select("*")
     .eq("game", gameId); // Filter by game_id
 
@@ -51,9 +51,9 @@ export const updateAllPlayersByGameID = async (
   payload: Player
 ) => {
   const { data, error } = await supabase
-    .from("players")
+    .from(TABLE)
     .update({ ...payload })
-    .eq("game", gameId)
+    .eq("game", gameId);
 
   if (error) {
     console.error("Error resetting votes:", error);
@@ -61,4 +61,30 @@ export const updateAllPlayersByGameID = async (
   }
 
   return data;
+};
+
+export const deletePlayerByID = async (playerID: number) => {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .delete()
+    .eq("id", playerID)
+    .select();
+
+  if (error) {
+    console.error(`Error deleting player with id ${playerID}:`, error);
+    return false;
+  }
+
+  return data[0];
+};
+
+export const deleteAllPlayerByGameID = async (gameID: number) => {
+  const { error } = await supabase.from(TABLE).delete().eq("game", gameID);
+
+  if (error) {
+    console.error(`Error deleting player with game id ${gameID}:`, error);
+    return false;
+  }
+
+  return true;
 };

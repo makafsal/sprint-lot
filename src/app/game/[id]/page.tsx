@@ -2,15 +2,17 @@
 
 import { Card, CardBody, CardHeader } from "@/app/components/Card";
 import { Checkbox } from "@/app/components/Checkbox";
-import styles from "./gamePage.module.css";
+import styles from "./GamePage.module.css";
 import { useContext, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { getGameByID, updateGame } from "@/lib/game";
+import { deleteGameByID, getGameByID, updateGame } from "@/lib/game";
 import { AppCxt, Game, Player } from "@/app/context/AppCxt";
 import {
+  deleteAllPlayerByGameID,
+  deletePlayerByID,
   getAllPlayersByGameID,
   updateAllPlayersByGameID,
-  updatePlayer
+  updatePlayerByID
 } from "@/lib/player";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
@@ -20,7 +22,6 @@ const SIZES = [0, 1, 2, 3, 5, 8, 13, 21];
 const GamePage = () => {
   const router = useRouter();
   const [player, setPlayer] = useState<Player>();
-  const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
     const currentPlayer = localStorage?.getItem("player");
@@ -32,6 +33,8 @@ const GamePage = () => {
     }
   }, [router]);
 
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [inviteOpen, setInviteOpen] = useState<boolean>(false);
   const { id: gameID } = useParams();
   const { state, dispatch } = useContext(AppCxt);
 
@@ -39,11 +42,15 @@ const GamePage = () => {
     const fetchGame = async () => {
       const game = await getGameByID(gameID as string);
 
-      dispatch({ type: "UPDATE_GAME", payload: { game } });
+      if (game) {
+        dispatch({ type: "UPDATE_GAME", payload: { game } });
+      } else {
+        router.push("/");
+      }
     };
 
     fetchGame();
-  }, [dispatch, gameID]);
+  }, [dispatch, gameID, router]);
 
   useEffect(() => {
     const playersChannel = supabase
@@ -65,7 +72,6 @@ const GamePage = () => {
                 : player
             )
           );
-
           setPlayer((prevPlayer) =>
             prevPlayer?.id === newPlayer?.id ? newPlayer : prevPlayer
           );
@@ -92,7 +98,6 @@ const GamePage = () => {
         (payload) => {
           const newPlayer = payload.new as Player;
           setPlayers((prevPlayers) => [...prevPlayers, newPlayer]);
-
           setPlayer((prevPlayer) =>
             prevPlayer?.id === newPlayer?.id ? newPlayer : prevPlayer
           );
@@ -138,23 +143,15 @@ const GamePage = () => {
         const _players = await getAllPlayersByGameID(state.game.id);
 
         setPlayers(_players);
-
-        setPlayer((prevPlayer) => {
-          const newPlayer = _players.find((p) => prevPlayer?.id === p.id);
-
-          if (newPlayer) {
-            return newPlayer;
-          }
-        });
       }
     };
 
     fetchPlayers();
-  }, [state]);
+  }, [state?.game?.id]);
 
   const castVote = async (size: number) => {
     if (player?.id) {
-      await updatePlayer(player.id, { vote: size });
+      await updatePlayerByID(player.id, { vote: size });
       setPlayer((prevPlayer) => ({ ...prevPlayer, vote: size }));
     }
   };
@@ -191,8 +188,50 @@ const GamePage = () => {
     }
   };
 
+  const deleteGame = async () => {
+    if (state.game?.id) {
+      await updateGame(state.game?.id, { owner: null });
+      await deleteAllPlayerByGameID(state.game?.id);
+      const deletedGame = await deleteGameByID(state.game?.id);
+      localStorage.removeItem("player");
+
+      if (deletedGame) {
+        router.push("/");
+      }
+    }
+  };
+
+  const exit = async () => {
+    if (player?.id) {
+      const deletedPlayer = await deletePlayerByID(player.id);
+
+      if (deletedPlayer) {
+        router.push("/");
+        localStorage.removeItem("player");
+      }
+    }
+  };
+
+  const copy = async () => {
+    if (state.game?.game_id) {
+      await navigator.clipboard.writeText(state.game?.game_id);
+
+      setTimeout(() => {
+        setInviteOpen(false);
+      }, 1000);
+    }
+  };
+
   return (
     <>
+      <dialog open={inviteOpen}>
+        <code>{state.game?.game_id}</code>
+        <button className={styles.copyButton} onClick={() => copy()}>
+          {" "}
+          &#x2398;
+        </button>
+        <button onClick={() => setInviteOpen(false)}>X</button>
+      </dialog>
       <section className={`${styles.playersList}`}>
         {players?.map((_player: Player) => (
           <Card className={styles.playerCard} key={_player.id}>
@@ -219,8 +258,11 @@ const GamePage = () => {
         <div className={styles.boardActions}>
           <button onClick={() => reveal()}>Reveal</button>
           <button onClick={() => reset()}>Reset</button>
-          <button>Delete</button>
-          <button>Invite</button>
+          <button onClick={() => setInviteOpen(true)}>Invite</button>
+          {state.game?.owner === player?.id && (
+            <button onClick={() => deleteGame()}>Delete</button>
+          )}
+          <button onClick={() => exit()}>Exit</button>
         </div>
         <div className={styles.gameData}>
           <div className={styles.gameStatus}>
