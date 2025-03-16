@@ -138,6 +138,29 @@ const GamePage = () => {
   }, [dispatch, state.game]);
 
   useEffect(() => {
+    const gameChannel = supabase
+      .channel("game-delete")
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "games"
+        },
+        (deletedGame) => {
+          if (deletedGame?.old?.id === state.game?.id) {
+            router.push("/");
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(gameChannel);
+    };
+  }, [router, state.game?.id]);
+
+  useEffect(() => {
     const fetchPlayers = async () => {
       if (state.game?.id) {
         const _players = await getAllPlayersByGameID(state.game.id);
