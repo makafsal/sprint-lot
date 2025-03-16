@@ -5,6 +5,7 @@ import { getGameByID } from "@/lib/game";
 import { createPlayer } from "@/lib/player";
 import { useRouter } from "next/navigation";
 import { Game } from "@/app/context/AppCxt";
+import { Loader } from "../Loader";
 
 export const JoinForm = () => {
   const [gameID, setGameID] = useState<string>();
@@ -34,20 +35,23 @@ export const JoinForm = () => {
   };
 
   return (
-    <div className="form vertical">
-      <input
-        onChange={(ev) => setGameID(ev?.target?.value)}
-        type="text"
-        placeholder="Game ID... *"
-      />
-      <input
-        onChange={(ev) => setPlayerName(ev?.target?.value)}
-        type="text"
-        placeholder="Your Name... *"
-      />
-      <button onClick={() => onJoin()} disabled={loading}>
-        Join
-      </button>
-    </div>
+    <>
+      {loading && <Loader />}
+      <div className="form vertical">
+        <input
+          onChange={(ev) => setGameID(ev?.target?.value)}
+          type="text"
+          placeholder="Game ID... *"
+        />
+        <input
+          onChange={(ev) => setPlayerName(ev?.target?.value)}
+          type="text"
+          placeholder="Your Name... *"
+        />
+        <button onClick={() => onJoin()} disabled={loading}>
+          Join
+        </button>
+      </div>
+    </>
   );
 };

@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { DeleteDialog } from "@/app/components/DeleteDialog";
 import { InviteDialog } from "@/app/components/InviteDialog";
 import { ExitDialog } from "@/app/components/ExitDialog";
+import { Loader } from "@/app/components/Loader";
 
 const SIZES = [0, 1, 2, 3, 5, 8, 13, 21];
 
