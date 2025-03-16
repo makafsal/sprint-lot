@@ -16,6 +16,9 @@ import {
 } from "@/lib/player";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { DeleteDialog } from "@/app/components/DeleteDialog";
+import { InviteDialog } from "@/app/components/InviteDialog";
+import { ExitDialog } from "@/app/components/ExitDialog";
 
 const SIZES = [0, 1, 2, 3, 5, 8, 13, 21];
 
@@ -35,6 +38,8 @@ const GamePage = () => {
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [inviteOpen, setInviteOpen] = useState<boolean>(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [exitDialogOpen, setExitDialogOpen] = useState(false);
   const { id: gameID } = useParams();
   const { state, dispatch } = useContext(AppCxt);
 
@@ -138,6 +143,29 @@ const GamePage = () => {
   }, [dispatch, state.game]);
 
   useEffect(() => {
+    const gameChannel = supabase
+      .channel("game-delete")
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "games"
+        },
+        (deletedGame) => {
+          if (deletedGame?.old?.id === state.game?.id) {
+            router.push("/");
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(gameChannel);
+    };
+  }, [router, state.game?.id]);
+
+  useEffect(() => {
     const fetchPlayers = async () => {
       if (state.game?.id) {
         const _players = await getAllPlayersByGameID(state.game.id);
@@ -212,26 +240,24 @@ const GamePage = () => {
     }
   };
 
-  const copy = async () => {
-    if (state.game?.game_id) {
-      await navigator.clipboard.writeText(state.game?.game_id);
-
-      setTimeout(() => {
-        setInviteOpen(false);
-      }, 1000);
-    }
-  };
-
   return (
     <>
-      <dialog open={inviteOpen}>
-        <code>{state.game?.game_id}</code>
-        <button className={styles.copyButton} onClick={() => copy()}>
-          {" "}
-          &#x2398;
-        </button>
-        <button onClick={() => setInviteOpen(false)}>X</button>
-      </dialog>
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onYes={() => deleteGame()}
+        onNo={() => setDeleteDialogOpen(false)}
+      />
+      <InviteDialog
+        gameID={state?.game?.game_id}
+        open={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+      />
+      <ExitDialog
+        open={exitDialogOpen}
+        onNo={() => setExitDialogOpen(false)}
+        onYes={() => exit()}
+      />
+
       <section className={`${styles.playersList}`}>
         {players?.map((_player: Player) => (
           <Card className={styles.playerCard} key={_player.id}>
@@ -259,16 +285,24 @@ const GamePage = () => {
           <button onClick={() => reveal()}>Reveal</button>
           <button onClick={() => reset()}>Reset</button>
           <button onClick={() => setInviteOpen(true)}>Invite</button>
-          {state.game?.owner === player?.id && (
-            <button onClick={() => deleteGame()}>Delete</button>
-          )}
-          <button onClick={() => exit()}>Exit</button>
+          <button onClick={() => setDeleteDialogOpen(true)}>Delete</button>
+          <button
+            disabled={state.game?.owner === player?.id}
+            title={
+              state.game?.owner === player?.id
+                ? "As the owner, you cannot exit this game, but you can delete it."
+                : "Exit"
+            }
+            onClick={() => setExitDialogOpen(true)}
+          >
+            Exit
+          </button>
         </div>
         <div className={styles.gameData}>
           <div className={styles.gameStatus}>
             {state.game?.status?.toUpperCase()}
           </div>
-          <h3>Average: {state.game?.average}</h3>
+          <h3>Average: {state.game?.average?.toFixed(2)}</h3>
         </div>
       </section>
       <section className={styles.sizeList}>
