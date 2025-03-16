@@ -7,7 +7,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(appReducer, defaultState);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", state.theme);
+    document.documentElement.setAttribute("data-theme", state.theme || 'light');
   }, [state]);
 
   return (
