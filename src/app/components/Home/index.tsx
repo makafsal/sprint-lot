@@ -1,3 +1,5 @@
+"use client";
+
 import { useSearchParams } from "next/navigation";
 import styles from "./Home.module.css";
 import { CreateForm } from "../CreateForm";
