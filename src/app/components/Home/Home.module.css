@@ -1,0 +1,11 @@
+.home {
+  padding: 5rem 0;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.formSection {
+  margin-top: 2rem;
+}

@@ -1,0 +1,26 @@
+.card {
+  display: inline-flex;
+  flex-direction: column;
+  border: 1px solid var(--foreground);
+
+  .title {
+    border-bottom: 1px solid;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .title,
+  .body {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .selected {
+    background: var(--foreground);
+    color: var(--background);
+  }
+
+  &.disabled {
+    opacity: 0.75;
+    cursor: default;
+  }
+}

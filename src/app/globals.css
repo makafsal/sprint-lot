@@ -1,42 +1,91 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100;400;700&display=swap");
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Default Dark Theme */
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+/* Default Light Theme */
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-* {
+*:not(dialog) {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-weight: 400;
+  font-style: normal;
 }
 
-a {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+}
+
+button {
+  background: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--foreground);
+  padding: 0.5rem 0.5rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+button:disabled:hover {
+  background: inherit;
   color: inherit;
-  text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+button:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+main {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: calc(100vh - 3.75rem);
+  margin-inline: 2rem;
+  padding: 1rem 0;
+}
+
+.form.vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+input {
+  background: var(--background);
+  border: 1px solid var(--foreground);
+  padding: 0.5rem 1rem;
+  color: var(--foreground);
 }
