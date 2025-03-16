@@ -10,7 +10,7 @@
   align-items: center;
   z-index: 999;
 
-  p {
+  .text {
     opacity: 0;
     animation: blinking 1s infinite;
   }
