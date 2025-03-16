@@ -116,6 +116,29 @@ const GamePage = () => {
   }, [state.game?.id]);
 
   useEffect(() => {
+    const playersChannel = supabase
+      .channel("players-exit")
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "players"
+        },
+        (payload) => {
+          setPlayers((prevPlayers) =>
+            prevPlayers.filter((_player) => _player.id !== payload?.old?.id)
+          );
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(playersChannel);
+    };
+  }, [state.game?.id]);
+
+  useEffect(() => {
     const gameChannel = supabase
       .channel("game-average")
       .on(
@@ -285,7 +308,9 @@ const GamePage = () => {
           <button onClick={() => reveal()}>Reveal</button>
           <button onClick={() => reset()}>Reset</button>
           <button onClick={() => setInviteOpen(true)}>Invite</button>
-          <button onClick={() => setDeleteDialogOpen(true)}>Delete</button>
+          {state.game?.owner === player?.id && (
+            <button onClick={() => setDeleteDialogOpen(true)}>Delete</button>
+          )}
           <button
             disabled={state.game?.owner === player?.id}
             title={
