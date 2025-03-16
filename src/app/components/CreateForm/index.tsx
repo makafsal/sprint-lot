@@ -2,6 +2,7 @@ import { createGame } from "@/lib/game";
 import { createPlayer, updatePlayerByID } from "@/lib/player";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loader } from "../Loader";
 
 export const CreateForm = () => {
   const [loading, setLoading] = useState(false);
@@ -16,7 +17,6 @@ export const CreateForm = () => {
     let newPlayer = await createPlayer({ name: playerName });
     const newGame = await createGame(gameName, newPlayer.id);
     newPlayer = await updatePlayerByID(newPlayer.id, { game: newGame.id });
-    console.log(newPlayer)
 
     // Create session for current user in localStorage
     localStorage.setItem("player", JSON.stringify(newPlayer));
@@ -31,20 +31,23 @@ export const CreateForm = () => {
   };
 
   return (
-    <div className="form vertical">
-      <input
-        type="text"
-        placeholder="Game Name... *"
-        onChange={(ev) => setGameName(ev?.target?.value)}
-      />
-      <input
-        type="text"
-        placeholder="Your Name..... *"
-        onChange={(ev) => setPlayerName(ev?.target?.value)}
-      />
-      <button onClick={() => onCreate()} disabled={loading}>
-        Create
-      </button>
-    </div>
+    <>
+      {loading && <Loader />}
+      <div className="form vertical">
+        <input
+          type="text"
+          placeholder="Game Name... *"
+          onChange={(ev) => setGameName(ev?.target?.value)}
+        />
+        <input
+          type="text"
+          placeholder="Your Name..... *"
+          onChange={(ev) => setPlayerName(ev?.target?.value)}
+        />
+        <button onClick={() => onCreate()} disabled={loading}>
+          Create
+        </button>
+      </div>
+    </>
   );
 };
