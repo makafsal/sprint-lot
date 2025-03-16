@@ -268,7 +268,7 @@ const GamePage = () => {
           <div className={styles.gameStatus}>
             {state.game?.status?.toUpperCase()}
           </div>
-          <h3>Average: {state.game?.average}</h3>
+          <h3>Average: {state.game?.average?.toFixed(2)}</h3>
         </div>
       </section>
       <section className={styles.sizeList}>
