@@ -213,7 +213,11 @@ const GamePage = () => {
     let sum = 0;
 
     players?.forEach((_player) => {
-      if (_player?.vote && _player?.vote !== null) {
+      if (
+        _player?.vote !== undefined &&
+        _player?.vote !== null &&
+        _player?.vote >= 0
+      ) {
         count++;
         sum += _player?.vote;
       }
@@ -290,7 +294,13 @@ const GamePage = () => {
             <CardBody className={styles.cardBodyAlt}>
               <div className={styles.cardContent}>
                 {state.game?.status === "done" ? (
-                  <>{_player?.vote || "?"}</>
+                  <>
+                    {_player?.vote !== null &&
+                    _player?.vote !== undefined &&
+                    _player?.vote >= 0
+                      ? _player?.vote
+                      : "🤔"}
+                  </>
                 ) : (
                   <Checkbox
                     className={styles.checkboxAlt}
@@ -331,6 +341,18 @@ const GamePage = () => {
         </div>
       </section>
       <section className={styles.sizeList}>
+        <Card
+          className={`${styles.numberCard} ${
+            player?.vote === -1 ? styles.selected : ""
+          }`}
+          key={"🤔"}
+          onClick={() => castVote(-1)}
+          disabled={state.game?.status === "done"}
+        >
+          <CardBody className={styles.cardBodyAlt}>
+            <div className={styles.cardContent}>🤔</div>
+          </CardBody>
+        </Card>
         {SIZES.map((size) => (
           <Card
             className={`${styles.numberCard} ${
