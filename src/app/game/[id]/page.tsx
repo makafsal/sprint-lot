@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { DeleteDialog } from "@/app/components/DeleteDialog";
 import { InviteDialog } from "@/app/components/InviteDialog";
 import { ExitDialog } from "@/app/components/ExitDialog";
+import { ReadyNotification } from "@/app/components/ReadyNotification";
 
 const SIZES = [0, 1, 2, 3, 5, 8, 13, 21];
 
@@ -40,6 +41,7 @@ const GamePage = () => {
   const [inviteOpen, setInviteOpen] = useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
+  const [votesInDialogOpen, setVotesInDialogOpen] = useState(false);
   const { id: gameID } = useParams();
   const { state, dispatch } = useContext(AppCxt);
 
@@ -77,9 +79,14 @@ const GamePage = () => {
                 : player
             )
           );
-          setPlayer((prevPlayer) =>
-            prevPlayer?.id === newPlayer?.id ? newPlayer : prevPlayer
-          );
+          setPlayer((prevPlayer) => {
+            if (prevPlayer?.id === newPlayer?.id) {
+              localStorage.setItem("player", JSON.stringify(newPlayer));
+              return newPlayer;
+            } else {
+              return prevPlayer;
+            }
+          });
         }
       )
       .subscribe();
@@ -192,13 +199,41 @@ const GamePage = () => {
     const fetchPlayers = async () => {
       if (state.game?.id) {
         const _players = await getAllPlayersByGameID(state.game.id);
-
         setPlayers(_players);
       }
     };
 
     fetchPlayers();
   }, [state?.game?.id]);
+
+  useEffect(() => {
+    if (state?.game?.status === "started") {
+      let count = 0;
+
+      players.forEach((_player) => {
+        if (
+          _player.vote !== null &&
+          _player.vote !== undefined &&
+          isFinite(_player.vote)
+        ) {
+          count++;
+
+          if (
+            count > 0 &&
+            count === players?.length &&
+            sessionStorage?.getItem("ready_to_reveal") !== "Yes"
+          ) {
+            setVotesInDialogOpen(true);
+            sessionStorage?.setItem("ready_to_reveal", "Yes");
+
+            setTimeout(() => setVotesInDialogOpen(false), 3000);
+          }
+        }
+      });
+    } else if (sessionStorage?.getItem("ready_to_reveal")) {
+      sessionStorage?.removeItem("ready_to_reveal");
+    }
+  }, [players, state?.game?.status]);
 
   const castVote = async (size: number) => {
     if (player?.id) {
@@ -211,15 +246,22 @@ const GamePage = () => {
     // Average and update it in the table, then state
     let count = 0;
     let sum = 0;
+    let average = 0;
 
     players?.forEach((_player) => {
-      if (_player?.vote && _player?.vote !== null) {
+      if (
+        _player?.vote !== undefined &&
+        _player?.vote !== null &&
+        _player?.vote >= 0
+      ) {
         count++;
         sum += _player?.vote;
       }
     });
 
-    const average = sum / count;
+    if (sum > 0 && count > 0) {
+      average = sum / count;
+    }
 
     if (
       (!Number.isNaN(average) || Number.isFinite(average)) &&
@@ -234,8 +276,8 @@ const GamePage = () => {
 
   const reset = async () => {
     if (state.game?.id) {
-      await updateGame(state.game?.id, { status: "started", average: 0 });
       await updateAllPlayersByGameID(state.game?.id, { vote: null });
+      await updateGame(state.game?.id, { status: "started", average: 0 });
     }
   };
 
@@ -281,6 +323,8 @@ const GamePage = () => {
         onYes={() => exit()}
       />
 
+      <ReadyNotification open={votesInDialogOpen} />
+
       <section className={`${styles.playersList}`}>
         {players?.map((_player: Player) => (
           <Card className={styles.playerCard} key={_player.id}>
@@ -290,7 +334,13 @@ const GamePage = () => {
             <CardBody className={styles.cardBodyAlt}>
               <div className={styles.cardContent}>
                 {state.game?.status === "done" ? (
-                  <>{_player?.vote || "?"}</>
+                  <>
+                    {_player?.vote !== null &&
+                    _player?.vote !== undefined &&
+                    _player?.vote >= 0
+                      ? _player?.vote
+                      : "🤔"}
+                  </>
                 ) : (
                   <Checkbox
                     className={styles.checkboxAlt}
@@ -331,6 +381,18 @@ const GamePage = () => {
         </div>
       </section>
       <section className={styles.sizeList}>
+        <Card
+          className={`${styles.numberCard} ${
+            player?.vote === -1 ? styles.selected : ""
+          }`}
+          key={"🤔"}
+          onClick={() => castVote(-1)}
+          disabled={state.game?.status === "done"}
+        >
+          <CardBody className={styles.cardBodyAlt}>
+            <div className={styles.cardContent}>🤔</div>
+          </CardBody>
+        </Card>
         {SIZES.map((size) => (
           <Card
             className={`${styles.numberCard} ${
