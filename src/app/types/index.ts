@@ -28,6 +28,7 @@ export interface JoinFormProps {
 }
 
 export type Theme = "light" | "dark";
+export type GameType = "fibonacci" | "t-shirt" | "confidence";
 
 export interface Game {
   average?: number;
@@ -37,6 +38,7 @@ export interface Game {
   name?: string;
   owner?: number | null;
   status?: "started" | "in_progress" | "done";
+  type?: GameType;
 }
 
 export interface Player {
