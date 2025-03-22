@@ -11,7 +11,9 @@ export const Home = () => {
 
   const getForm = () => {
     if (formType === "join") {
-      return <JoinForm />;
+      const gameID = searchParams.get("id") || undefined;
+
+      return <JoinForm sessionID={gameID} />;
     } else {
       return <CreateForm />;
     }

@@ -26,31 +26,32 @@ const SIZES = [0, 1, 2, 3, 5, 8, 13, 21];
 const GamePage = () => {
   const router = useRouter();
   const [player, setPlayer] = useState<Player>();
-
-  useEffect(() => {
-    const currentPlayer = localStorage?.getItem("player");
-
-    if (!currentPlayer) {
-      router.push("/?type=join");
-    } else {
-      setPlayer(JSON.parse(currentPlayer));
-    }
-  }, [router]);
+  const { state, dispatch } = useContext(AppCxt);
+  const { id: gameID } = useParams();
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [inviteOpen, setInviteOpen] = useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
   const [votesInDialogOpen, setVotesInDialogOpen] = useState(false);
-  const { id: gameID } = useParams();
-  const { state, dispatch } = useContext(AppCxt);
 
   useEffect(() => {
     const fetchGame = async () => {
-      const game = await getGameByID(gameID as string);
+      const game: Game = await getGameByID(gameID as string);
 
       if (game) {
         dispatch({ type: "UPDATE_GAME", payload: { game } });
+
+        const localPlayer = localStorage?.getItem("player");
+        const parsedPlayer = localPlayer
+          ? (JSON.parse(localPlayer) as Player)
+          : null;
+
+        if (parsedPlayer && parsedPlayer?.game === game?.id) {
+          setPlayer(parsedPlayer);
+        } else {
+          router.push(`/?type=join&id=${gameID}`);
+        }
       } else {
         router.push("/");
       }
@@ -207,7 +208,7 @@ const GamePage = () => {
   }, [state?.game?.id]);
 
   useEffect(() => {
-    if (state?.game?.status === "started") {
+    if (state?.game?.status === "in_progress") {
       let count = 0;
 
       players.forEach((_player) => {
@@ -238,6 +239,11 @@ const GamePage = () => {
   const castVote = async (size: number) => {
     if (player?.id) {
       await updatePlayerByID(player.id, { vote: size });
+      if (state?.game?.status === "started" && state.game?.id) {
+        await updateGame(state.game?.id, {
+          status: "in_progress"
+        });
+      }
       setPlayer((prevPlayer) => ({ ...prevPlayer, vote: size }));
     }
   };
