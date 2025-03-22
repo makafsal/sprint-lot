@@ -20,9 +20,18 @@ import { DeleteDialog } from "@/app/components/DeleteDialog";
 import { InviteDialog } from "@/app/components/InviteDialog";
 import { ExitDialog } from "@/app/components/ExitDialog";
 import { ReadyNotification } from "@/app/components/ReadyNotification";
-import { Game, Player } from "@/app/types";
+import { Game, GameType, Player } from "@/app/types";
 
-const SIZES = [0, 1, 2, 3, 5, 8, 13, 21];
+const FIBONACCI = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
+const T_SHIRT = [
+  { text: "XXS", value: 1 },
+  { text: "XS", value: 2 },
+  { text: "S", value: 3 },
+  { text: "M", value: 4 },
+  { text: "L", value: 5 },
+  { text: "XL", value: 6 },
+  { text: "XXL", value: 7 }
+];
 
 const GamePage = () => {
   const router = useRouter();
@@ -216,6 +225,7 @@ const GamePage = () => {
         if (
           _player.vote !== null &&
           _player.vote !== undefined &&
+          typeof _player.vote == "number" &&
           isFinite(_player.vote)
         ) {
           count++;
@@ -235,7 +245,7 @@ const GamePage = () => {
     } else if (sessionStorage?.getItem("ready_to_reveal")) {
       sessionStorage?.removeItem("ready_to_reveal");
     }
-  }, [players, state?.game?.status]);
+  }, [players, state?.game?.status, state?.game?.type]);
 
   const castVote = async (size: number) => {
     if (player?.id) {
@@ -250,32 +260,39 @@ const GamePage = () => {
   };
 
   const reveal = async () => {
-    // Average and update it in the table, then state
-    let count = 0;
-    let sum = 0;
-    let average = 0;
+    if (state?.game?.type === "fibonacci") {
+      // Average and update it in the table, then state
+      let count = 0;
+      let sum = 0;
+      let average = 0;
 
-    players?.forEach((_player) => {
-      if (
-        _player?.vote !== undefined &&
-        _player?.vote !== null &&
-        _player?.vote >= 0
-      ) {
-        count++;
-        sum += _player?.vote;
+      players?.forEach((_player) => {
+        if (
+          _player?.vote !== undefined &&
+          _player?.vote !== null &&
+          typeof _player?.vote === "number" &&
+          _player?.vote >= 0
+        ) {
+          count++;
+          sum += _player?.vote;
+        }
+      });
+
+      if (sum > 0 && count > 0) {
+        average = sum / count;
       }
-    });
 
-    if (sum > 0 && count > 0) {
-      average = sum / count;
-    }
-
-    if (
-      (!Number.isNaN(average) || Number.isFinite(average)) &&
-      state.game?.id
-    ) {
+      if (
+        (!Number.isNaN(average) || Number.isFinite(average)) &&
+        state.game?.id
+      ) {
+        await updateGame(state.game?.id, {
+          average: average,
+          status: "done"
+        });
+      }
+    } else if (state.game?.id && state?.game?.type === "t-shirt") {
       await updateGame(state.game?.id, {
-        average: average,
         status: "done"
       });
     }
@@ -312,6 +329,64 @@ const GamePage = () => {
     }
   };
 
+  const getGameCards = (type?: GameType) => {
+    if (type === "fibonacci") {
+      return (
+        <>
+          {FIBONACCI.map((size) => (
+            <Card
+              className={`${styles.voteCard} ${
+                player?.vote === size ? styles.selected : ""
+              }`}
+              key={size}
+              onClick={() => castVote(size)}
+              disabled={state.game?.status === "done"}
+            >
+              <CardBody className={styles.cardBodyAlt}>
+                <div className={styles.cardContent}>{size}</div>
+              </CardBody>
+            </Card>
+          ))}
+        </>
+      );
+    } else if (type === "t-shirt") {
+      return (
+        <>
+          {T_SHIRT.map((size) => (
+            <Card
+              className={`${styles.voteCard} ${
+                player?.vote === size.value ? styles.selected : ""
+              }`}
+              key={size.value}
+              onClick={() => castVote(size.value)}
+              disabled={state.game?.status === "done"}
+            >
+              <CardBody className={styles.cardBodyAlt}>
+                <div className={styles.cardContent}>{size.text}</div>
+              </CardBody>
+            </Card>
+          ))}
+        </>
+      );
+    }
+  };
+
+  const displayVote = (player: Player) => {
+    if (state?.game?.type === "t-shirt") {
+      return T_SHIRT?.find((size) => size.value === player?.vote)?.text || "🤔";
+    } else {
+      if (
+        player?.vote !== null &&
+        player?.vote !== undefined &&
+        player?.vote >= 0
+      ) {
+        return player?.vote;
+      } else {
+        return "🤔";
+      }
+    }
+  };
+
   return (
     <>
       <DeleteDialog
@@ -341,13 +416,7 @@ const GamePage = () => {
             <CardBody className={styles.cardBodyAlt}>
               <div className={styles.cardContent}>
                 {state.game?.status === "done" ? (
-                  <>
-                    {_player?.vote !== null &&
-                    _player?.vote !== undefined &&
-                    _player?.vote >= 0
-                      ? _player?.vote
-                      : "🤔"}
-                  </>
+                  <>{displayVote(_player)}</>
                 ) : (
                   <Checkbox
                     className={styles.checkboxAlt}
@@ -362,8 +431,18 @@ const GamePage = () => {
       </section>
       <section className={styles.gameBoard}>
         <div className={styles.boardActions}>
-          <button onClick={() => reveal()}>Reveal</button>
-          <button onClick={() => reset()}>Reset</button>
+          <button
+            disabled={state?.game?.status !== "in_progress"}
+            onClick={() => reveal()}
+          >
+            Reveal
+          </button>
+          <button
+            onClick={() => reset()}
+            disabled={state?.game?.status === "started"}
+          >
+            Reset
+          </button>
           <button onClick={() => setInviteOpen(true)}>Invite</button>
           {state.game?.owner === player?.id && (
             <button onClick={() => setDeleteDialogOpen(true)}>Delete</button>
@@ -384,12 +463,14 @@ const GamePage = () => {
           <div className={styles.gameStatus}>
             {state.game?.status?.toUpperCase()}
           </div>
-          <h3>Average: {state.game?.average?.toFixed(2)}</h3>
+          {state?.game?.type !== "t-shirt" && (
+            <h3>Average: {state.game?.average?.toFixed(2)}</h3>
+          )}
         </div>
       </section>
       <section className={styles.sizeList}>
         <Card
-          className={`${styles.numberCard} ${
+          className={`${styles.voteCard} ${
             player?.vote === -1 ? styles.selected : ""
           }`}
           key={"🤔"}
@@ -400,20 +481,7 @@ const GamePage = () => {
             <div className={styles.cardContent}>🤔</div>
           </CardBody>
         </Card>
-        {SIZES.map((size) => (
-          <Card
-            className={`${styles.numberCard} ${
-              player?.vote === size ? styles.selected : ""
-            }`}
-            key={size}
-            onClick={() => castVote(size)}
-            disabled={state.game?.status === "done"}
-          >
-            <CardBody className={styles.cardBodyAlt}>
-              <div className={styles.cardContent}>{size}</div>
-            </CardBody>
-          </Card>
-        ))}
+        {getGameCards(state?.game?.type)}
       </section>
     </>
   );

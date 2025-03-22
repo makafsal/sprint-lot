@@ -83,6 +83,7 @@ main {
   gap: 0.5rem;
 }
 
+select,
 input {
   background: var(--background);
   border: 1px solid var(--foreground);
