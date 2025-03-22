@@ -4,9 +4,8 @@ import { useState } from "react";
 import { getGameByID } from "@/lib/game";
 import { createPlayer } from "@/lib/player";
 import { useRouter } from "next/navigation";
-import { Game } from "@/app/context/AppCxt";
 import { Loader } from "../Loader";
-import { JoinFormProps } from "@/app/types";
+import { Game, JoinFormProps } from "@/app/types";
 
 export const JoinForm = ({ sessionID }: JoinFormProps) => {
   const [gameID, setGameID] = useState<string | undefined>(sessionID);
