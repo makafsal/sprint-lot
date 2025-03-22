@@ -2,20 +2,14 @@
 
 import { useEffect, useState } from "react";
 import styles from "./checkbox.module.css";
-
-interface Checkbox {
-  className?: string;
-  onToggle?: () => void;
-  checked?: boolean;
-  disabled?: boolean;
-}
+import { CheckboxProps } from "@/app/types";
 
 export const Checkbox = ({
   className,
   onToggle,
   checked,
   disabled
-}: Checkbox) => {
+}: CheckboxProps) => {
   const [check, setCheck] = useState<boolean>(checked || false);
 
   const toggle = () => {

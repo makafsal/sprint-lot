@@ -6,12 +6,9 @@ import { createPlayer } from "@/lib/player";
 import { useRouter } from "next/navigation";
 import { Game } from "@/app/context/AppCxt";
 import { Loader } from "../Loader";
+import { JoinFormProps } from "@/app/types";
 
-interface JoinForm {
-  sessionID?: string;
-}
-
-export const JoinForm = ({ sessionID }: JoinForm) => {
+export const JoinForm = ({ sessionID }: JoinFormProps) => {
   const [gameID, setGameID] = useState<string | undefined>(sessionID);
   const [playerName, setPlayerName] = useState<string>();
   const [loading, setLoading] = useState(false);

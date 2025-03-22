@@ -1,31 +1,7 @@
 import { createContext } from "react";
+import { Action, Store, Theme } from "../types";
 
-export type Theme = "light" | "dark";
 
-export interface Game {
-  average?: number;
-  created_at?: string;
-  game_id?: string;
-  id?: number;
-  name?: string;
-  owner?: number | null;
-  status?: "started" | "in_progress" | "done";
-}
-
-export interface Player {
-  created_at?: string;
-  game?: number;
-  id?: number;
-  name?: string;
-  vote?: number | null;
-}
-
-export interface Store {
-  theme?: Theme;
-  game?: Game;
-}
-
-type Action = { type: "TOGGLE_THEME" | "UPDATE_GAME"; payload?: Store };
 
 export const defaultState: Store = {
   theme:

@@ -1,4 +1,4 @@
-import { Game } from "@/app/context/AppCxt";
+import { Game } from "@/app/types";
 import { supabase } from "./supabaseClient";
 
 const TABLE = "games";

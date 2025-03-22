@@ -1,14 +1,9 @@
 "use client";
 
+import { DialogProps } from "@/app/types";
 import { useState } from "react";
 
-interface InviteDialog {
-  open?: boolean;
-  gameID?: string;
-  onClose?: () => void;
-}
-
-export const InviteDialog = (props: InviteDialog) => {
+export const InviteDialog = (props: DialogProps) => {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {

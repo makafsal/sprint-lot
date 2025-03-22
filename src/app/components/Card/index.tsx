@@ -1,14 +1,9 @@
-import { PropsWithChildren } from "react";
+import { CardProps } from "@/app/types";
 import styles from "./Card.module.css";
 
-interface Card extends PropsWithChildren {
-  className?: string;
-  onClick?: () => void;
-  selected?: boolean;
-  disabled?: boolean;
-}
 
-export const CardHeader = ({ children, className, selected }: Card) => {
+
+export const CardHeader = ({ children, className, selected }: CardProps) => {
   return (
     <div
       className={`${styles.title} ${className} ${
@@ -20,11 +15,11 @@ export const CardHeader = ({ children, className, selected }: Card) => {
   );
 };
 
-export const CardBody = ({ children, className }: Card) => {
+export const CardBody = ({ children, className }: CardProps) => {
   return <div className={`${styles.body} ${className}`}>{children}</div>;
 };
 
-export const Card = ({ children, className, onClick, disabled }: Card) => {
+export const Card = ({ children, className, onClick, disabled }: CardProps) => {
   return (
     <div
       className={`${styles.card} ${className} ${disabled ? styles.disabled : ''}`}
