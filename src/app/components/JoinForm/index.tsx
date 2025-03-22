@@ -7,8 +7,12 @@ import { useRouter } from "next/navigation";
 import { Game } from "@/app/context/AppCxt";
 import { Loader } from "../Loader";
 
-export const JoinForm = () => {
-  const [gameID, setGameID] = useState<string>();
+interface JoinForm {
+  sessionID?: string;
+}
+
+export const JoinForm = ({ sessionID }: JoinForm) => {
+  const [gameID, setGameID] = useState<string | undefined>(sessionID);
   const [playerName, setPlayerName] = useState<string>();
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -39,6 +43,7 @@ export const JoinForm = () => {
       {loading && <Loader />}
       <div className="form vertical">
         <input
+          defaultValue={gameID}
           onChange={(ev) => setGameID(ev?.target?.value)}
           type="text"
           placeholder="Game ID... *"
