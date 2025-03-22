@@ -1,10 +1,7 @@
-interface ExitDialog {
-  open?: boolean;
-  onYes?: () => void;
-  onNo?: () => void;
-}
+import { DialogProps } from "@/app/types";
 
-export const ExitDialog = (prop: ExitDialog) => {
+
+export const ExitDialog = (prop: DialogProps) => {
   return (
     <dialog open={prop.open}>
       <p>Do you want to exit from this game?</p>

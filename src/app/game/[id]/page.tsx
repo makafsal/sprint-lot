@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import styles from "./gamePage.module.css";
 import { useParams } from "next/navigation";
 import { deleteGameByID, getGameByID, updateGame } from "@/lib/game";
-import { AppCxt, Game, Player } from "@/app/context/AppCxt";
+import { AppCxt } from "@/app/context/AppCxt";
 import {
   deleteAllPlayerByGameID,
   deletePlayerByID,
@@ -20,6 +20,7 @@ import { DeleteDialog } from "@/app/components/DeleteDialog";
 import { InviteDialog } from "@/app/components/InviteDialog";
 import { ExitDialog } from "@/app/components/ExitDialog";
 import { ReadyNotification } from "@/app/components/ReadyNotification";
+import { Game, Player } from "@/app/types";
 
 const SIZES = [0, 1, 2, 3, 5, 8, 13, 21];
 

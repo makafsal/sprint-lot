@@ -1,4 +1,4 @@
-import { Player } from "@/app/context/AppCxt";
+import { Player } from "@/app/types";
 import { supabase } from "./supabaseClient";
 
 const TABLE = "players";
