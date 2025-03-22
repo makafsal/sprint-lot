@@ -207,7 +207,7 @@ const GamePage = () => {
   }, [state?.game?.id]);
 
   useEffect(() => {
-    if (state?.game?.status === "started") {
+    if (state?.game?.status === "in_progress") {
       let count = 0;
 
       players.forEach((_player) => {
@@ -238,6 +238,11 @@ const GamePage = () => {
   const castVote = async (size: number) => {
     if (player?.id) {
       await updatePlayerByID(player.id, { vote: size });
+      if (state?.game?.status === "started" && state.game?.id) {
+        await updateGame(state.game?.id, {
+          status: "in_progress"
+        });
+      }
       setPlayer((prevPlayer) => ({ ...prevPlayer, vote: size }));
     }
   };
