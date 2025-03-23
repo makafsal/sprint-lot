@@ -269,7 +269,7 @@ const GamePage = () => {
       // Average and update it in the table, then state
       let count = 0;
       let sum = 0;
-      let average = 0;
+      let average = -1;
 
       players?.forEach((_player) => {
         if (
@@ -279,6 +279,7 @@ const GamePage = () => {
           _player?.vote >= 0
         ) {
           count++;
+          average = 0;
           sum += _player?.vote;
         }
       });
@@ -389,6 +390,22 @@ const GamePage = () => {
     }
   };
 
+  const getConfidenceIndicator = () => {
+    if (state?.game?.type === "confidence" && state?.game?.status === "done") {
+      const average = state?.game?.average;
+
+      if (average !== undefined && average >= 0 && average <= 2) {
+        return "🔴 Low";
+      } else if (average !== undefined && average >= 3 && average < 4) {
+        return "🟡 Moderate";
+      } else if (average !== undefined && average >= 4) {
+        return "🟢 High";
+      } else {
+        return "🤔 Uncertain";
+      }
+    }
+  };
+
   return (
     <>
       <DeleteDialog
@@ -466,7 +483,13 @@ const GamePage = () => {
             {state.game?.status?.toUpperCase()}
           </div>
           {state?.game?.type !== "t-shirt" && (
-            <h3>Average: {state.game?.average?.toFixed(2)}</h3>
+            <h3>
+              Average:{" "}
+              {state.game?.average === -1
+                ? "?"
+                : state.game?.average?.toFixed(2)}{" "}
+              {getConfidenceIndicator()}
+            </h3>
           )}
         </div>
       </section>
