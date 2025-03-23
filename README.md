@@ -6,10 +6,11 @@ A planning poker game for agile teams to estimate ticket sizes collaboratively.
  - Free
  - Minimalistic UI
  - Dark and Light mode
- - Easy to use
+ - Fibonacci Sizes
+ - T-shirt sizes
+ - Confidence score
 
-## Screenshots
+[Request a feature](https://github.com/makafsal/sprint-lot/issues/new)
 
-![image](https://github.com/user-attachments/assets/e0816b05-3cdf-4cc7-b3a0-ca85240d9c7a)
-
-![image](https://github.com/user-attachments/assets/65c0a898-50a3-41a2-85aa-269b7ca0e3a5)
+## App
+Explore the app [here](https://sprint-lot.vercel.app/)
