@@ -32,6 +32,7 @@ const T_SHIRT = [
   { text: "XL", value: 6 },
   { text: "XXL", value: 7 }
 ];
+const CONFIDENCE = [0, 1, 2, 3, 4, 5];
 
 const GamePage = () => {
   const router = useRouter();
@@ -260,7 +261,11 @@ const GamePage = () => {
   };
 
   const reveal = async () => {
-    if (state?.game?.type === "fibonacci") {
+    if (state.game?.id && state?.game?.type === "t-shirt") {
+      await updateGame(state.game?.id, {
+        status: "done"
+      });
+    } else {
       // Average and update it in the table, then state
       let count = 0;
       let sum = 0;
@@ -291,10 +296,6 @@ const GamePage = () => {
           status: "done"
         });
       }
-    } else if (state.game?.id && state?.game?.type === "t-shirt") {
-      await updateGame(state.game?.id, {
-        status: "done"
-      });
     }
   };
 
@@ -330,26 +331,7 @@ const GamePage = () => {
   };
 
   const getGameCards = (type?: GameType) => {
-    if (type === "fibonacci") {
-      return (
-        <>
-          {FIBONACCI.map((size) => (
-            <Card
-              className={`${styles.voteCard} ${
-                player?.vote === size ? styles.selected : ""
-              }`}
-              key={size}
-              onClick={() => castVote(size)}
-              disabled={state.game?.status === "done"}
-            >
-              <CardBody className={styles.cardBodyAlt}>
-                <div className={styles.cardContent}>{size}</div>
-              </CardBody>
-            </Card>
-          ))}
-        </>
-      );
-    } else if (type === "t-shirt") {
+    if (type === "t-shirt") {
       return (
         <>
           {T_SHIRT.map((size) => (
@@ -363,6 +345,26 @@ const GamePage = () => {
             >
               <CardBody className={styles.cardBodyAlt}>
                 <div className={styles.cardContent}>{size.text}</div>
+              </CardBody>
+            </Card>
+          ))}
+        </>
+      );
+    } else {
+      const sizes = type === "confidence" ? CONFIDENCE : FIBONACCI;
+      return (
+        <>
+          {sizes.map((size) => (
+            <Card
+              className={`${styles.voteCard} ${
+                player?.vote === size ? styles.selected : ""
+              }`}
+              key={size}
+              onClick={() => castVote(size)}
+              disabled={state.game?.status === "done"}
+            >
+              <CardBody className={styles.cardBodyAlt}>
+                <div className={styles.cardContent}>{size}</div>
               </CardBody>
             </Card>
           ))}

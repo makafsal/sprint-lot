@@ -55,6 +55,9 @@ export const CreateForm = () => {
             Fibonacci (0, 1, 2, 3, 5, 8, 13, 21)
           </option>
           <option value="t-shirt">T-Shirts (XXS, XS, S, M, L, XL, XXL)</option>
+          <option value="confidence">
+            Confidence Score (0, 1, 2 ,3, 4, 5)
+          </option>
         </select>
         <button onClick={() => onCreate()} disabled={loading}>
           Create
