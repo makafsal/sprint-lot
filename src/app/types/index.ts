@@ -14,13 +14,11 @@ export interface CheckboxProps {
   disabled?: boolean;
 }
 
-export interface DialogProps {
+export interface DialogProps extends PropsWithChildren {
   open?: boolean;
   onYes?: () => void;
   onNo?: () => void;
   onClose?: () => void;
-  // Dialog specific
-  gameID?: string;
 }
 
 export interface JoinFormProps {
