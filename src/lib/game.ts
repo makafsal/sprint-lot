@@ -3,11 +3,8 @@ import { supabase } from "./supabaseClient";
 
 const TABLE = "games";
 
-export const createGame = async (name: string, playerID: number) => {
-  const { data, error } = await supabase
-    .from(TABLE)
-    .insert([{ name, owner: playerID }])
-    .select();
+export const createGame = async (game: Game) => {
+  const { data, error } = await supabase.from(TABLE).insert([game]).select();
 
   if (error) {
     console.error("Error creating game:", error);
