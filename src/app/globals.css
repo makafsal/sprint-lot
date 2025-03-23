@@ -64,7 +64,6 @@ button:disabled:hover {
   color: inherit;
 }
 
-dialog,
 button:hover {
   background: var(--foreground);
   color: var(--background);
@@ -90,6 +89,12 @@ input {
   border: 1px solid var(--foreground);
   padding: 0.5rem 1rem;
   color: var(--foreground);
+}
+
+/* Error messages */
+
+.error-message {
+  color: red;
 }
 
 /* utilities */

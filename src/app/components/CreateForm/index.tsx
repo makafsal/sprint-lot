@@ -13,27 +13,24 @@ export const CreateForm = () => {
   const router = useRouter();
 
   const onCreate = async () => {
-    setLoading(true);
-    if (!gameName?.trim() || !playerName?.trim()) return;
+    if (gameName?.trim()?.length && playerName?.trim()?.length) {
+      setLoading(true);
 
-    let newPlayer = await createPlayer({ name: playerName });
-    const newGame = await createGame({
-      name: gameName,
-      owner: newPlayer.id,
-      type: gameType
-    });
-    newPlayer = await updatePlayerByID(newPlayer.id, { game: newGame.id });
+      let newPlayer = await createPlayer({ name: playerName });
+      const newGame = await createGame({
+        name: gameName,
+        owner: newPlayer.id,
+        type: gameType
+      });
+      newPlayer = await updatePlayerByID(newPlayer.id, { game: newGame.id });
 
-    // Create session for current user in localStorage
-    localStorage.setItem("player", JSON.stringify(newPlayer));
+      // Create session for current user in localStorage
+      localStorage.setItem("player", JSON.stringify(newPlayer));
 
-    if (newGame) {
-      router.push(`/game/${newGame.game_id}`);
+      if (newGame) {
+        router.push(`/game/${newGame.game_id}`);
+      }
     }
-
-    setLoading(false);
-    setGameName("");
-    setPlayerName("");
   };
 
   return (
@@ -59,7 +56,12 @@ export const CreateForm = () => {
             Confidence Score (0, 1, 2 ,3, 4, 5)
           </option>
         </select>
-        <button onClick={() => onCreate()} disabled={loading}>
+        <button
+          onClick={() => onCreate()}
+          disabled={
+            loading || !playerName?.trim()?.length || !gameName?.trim()?.length
+          }
+        >
           Create
         </button>
       </div>
