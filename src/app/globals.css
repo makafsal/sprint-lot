@@ -64,6 +64,7 @@ button:disabled:hover {
   color: inherit;
 }
 
+dialog,
 button:hover {
   background: var(--foreground);
   color: var(--background);

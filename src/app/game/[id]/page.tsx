@@ -17,10 +17,9 @@ import {
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { DeleteDialog } from "@/app/components/DeleteDialog";
-import { InviteDialog } from "@/app/components/InviteDialog";
 import { ExitDialog } from "@/app/components/ExitDialog";
-import { ReadyNotification } from "@/app/components/ReadyNotification";
-import { Game, GameType, Player } from "@/app/types";
+import { Notification } from "@/app/components/Notification";
+import { DialogProps, Game, GameType, Player } from "@/app/types";
 
 const FIBONACCI = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
 const T_SHIRT = [
@@ -41,10 +40,11 @@ const GamePage = () => {
   const { id: gameID } = useParams();
 
   const [players, setPlayers] = useState<Player[]>([]);
-  const [inviteOpen, setInviteOpen] = useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
-  const [votesInDialogOpen, setVotesInDialogOpen] = useState(false);
+  const [notification, setNotification] = useState<DialogProps>({
+    open: false
+  });
 
   useEffect(() => {
     const fetchGame = async () => {
@@ -236,10 +236,13 @@ const GamePage = () => {
             count === players?.length &&
             sessionStorage?.getItem("ready_to_reveal") !== "Yes"
           ) {
-            setVotesInDialogOpen(true);
+            setNotification({ open: true, children: "Ready to reveal! 🤠" });
             sessionStorage?.setItem("ready_to_reveal", "Yes");
 
-            setTimeout(() => setVotesInDialogOpen(false), 3000);
+            setTimeout(
+              () => setNotification({ open: false, children: null }),
+              3000
+            );
           }
         }
       });
@@ -318,6 +321,14 @@ const GamePage = () => {
         router.push("/");
       }
     }
+  };
+
+  const invite = async () => {
+    await navigator.clipboard.writeText(window?.location?.href);
+
+    setNotification({ open: true, children: "Invite URL copied! 📋" });
+
+    setTimeout(() => setNotification({ open: false, children: null }), 1000);
   };
 
   const exit = async () => {
@@ -413,18 +424,16 @@ const GamePage = () => {
         onYes={() => deleteGame()}
         onNo={() => setDeleteDialogOpen(false)}
       />
-      <InviteDialog
-        gameID={state?.game?.game_id}
-        open={inviteOpen}
-        onClose={() => setInviteOpen(false)}
-      />
+
       <ExitDialog
         open={exitDialogOpen}
         onNo={() => setExitDialogOpen(false)}
         onYes={() => exit()}
       />
 
-      <ReadyNotification open={votesInDialogOpen} />
+      <Notification open={notification.open}>
+        {notification.children}
+      </Notification>
 
       <section className={`${styles.playersList}`}>
         {players?.map((_player: Player) => (
@@ -462,7 +471,7 @@ const GamePage = () => {
           >
             Reset
           </button>
-          <button onClick={() => setInviteOpen(true)}>Invite</button>
+          <button onClick={() => invite()}>Invite</button>
           {state.game?.owner === player?.id && (
             <button onClick={() => setDeleteDialogOpen(true)}>Delete</button>
           )}
