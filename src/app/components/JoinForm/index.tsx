@@ -11,27 +11,32 @@ export const JoinForm = ({ sessionID }: JoinFormProps) => {
   const [gameID, setGameID] = useState<string | undefined>(sessionID);
   const [playerName, setPlayerName] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const [showNoFoundErr, setShowNoFoundErr] = useState(false);
   const router = useRouter();
 
   const onJoin = async () => {
-    if (!gameID?.trim() || !playerName?.trim()) {
-      return;
+    if (gameID?.trim()?.length && playerName?.trim()?.length) {
+      setLoading(true);
+
+      const game: Game = await getGameByID(gameID);
+
+      if (game) {
+        setShowNoFoundErr(false);
+        const newPlayer = await createPlayer({
+          name: playerName,
+          game: game.id
+        });
+        localStorage.setItem("player", JSON.stringify(newPlayer));
+
+        router.push(`/game/${gameID}`);
+      } else {
+        setLoading(false);
+        setShowNoFoundErr(true);
+      }
+
+      setGameID("");
+      setPlayerName("");
     }
-
-    const game: Game = await getGameByID(gameID);
-
-    if (game) {
-      const newPlayer = await createPlayer({ name: playerName, game: game.id });
-      localStorage.setItem("player", JSON.stringify(newPlayer));
-
-      router.push(`/game/${gameID}`);
-    } else {
-      alert("Game not found!");
-    }
-
-    setLoading(false);
-    setGameID("");
-    setPlayerName("");
   };
 
   return (
@@ -49,9 +54,15 @@ export const JoinForm = ({ sessionID }: JoinFormProps) => {
           type="text"
           placeholder="Your Name... *"
         />
-        <button onClick={() => onJoin()} disabled={loading}>
+        <button
+          onClick={() => onJoin()}
+          disabled={
+            loading || !gameID?.trim()?.length || !playerName?.trim()?.length
+          }
+        >
           Join
         </button>
+        {showNoFoundErr && <p className="error-message">Game not found! 🔍</p>}
       </div>
     </>
   );

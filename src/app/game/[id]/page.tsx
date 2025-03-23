@@ -20,6 +20,7 @@ import { DeleteDialog } from "@/app/components/DeleteDialog";
 import { ExitDialog } from "@/app/components/ExitDialog";
 import { Notification } from "@/app/components/Notification";
 import { DialogProps, Game, GameType, Player } from "@/app/types";
+import { Loader } from "@/app/components/Loader";
 
 const FIBONACCI = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
 const T_SHIRT = [
@@ -45,6 +46,7 @@ const GamePage = () => {
   const [notification, setNotification] = useState<DialogProps>({
     open: false
   });
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchGame = async () => {
@@ -60,6 +62,7 @@ const GamePage = () => {
 
         if (parsedPlayer && parsedPlayer?.game === game?.id) {
           setPlayer(parsedPlayer);
+          setLoading(false);
         } else {
           router.push(`/?type=join&id=${gameID}`);
         }
@@ -434,6 +437,8 @@ const GamePage = () => {
       <Notification open={notification.open}>
         {notification.children}
       </Notification>
+
+      {loading && <Loader />}
 
       <section className={`${styles.playersList}`}>
         {players?.map((_player: Player) => (
