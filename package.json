@@ -2,6 +2,9 @@
   "name": "sprint-lot",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Afsal K"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
