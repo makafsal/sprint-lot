@@ -10,7 +10,7 @@ A planning poker game for agile teams to estimate ticket sizes collaboratively.
  - T-shirt sizes
  - Confidence score
 
-[Request a feature](https://github.com/makafsal/sprint-lot/issues/new)
+[Feature Request](https://github.com/makafsal/sprint-lot/issues/new)
 
 ## App
 Explore the app [here](https://sprint-lot.vercel.app/)
