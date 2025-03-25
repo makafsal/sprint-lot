@@ -439,7 +439,7 @@ const GamePage = () => {
       </Notification>
 
       {loading && <Loader />}
-
+      {/* Players list */}
       <section className={`${styles.playersList}`}>
         {players?.map((_player: Player) => (
           <Card className={styles.playerCard} key={_player.id}>
@@ -462,6 +462,7 @@ const GamePage = () => {
           </Card>
         ))}
       </section>
+      {/* Game controls */}
       <section className={styles.gameBoard}>
         <div className={styles.boardActions}>
           <button
@@ -491,6 +492,10 @@ const GamePage = () => {
           >
             Exit
           </button>
+          {/* <div>
+            <Checkbox />
+            <label htmlFor="scoreboard"> Enable Scoreboard</label>
+          </div> */}
         </div>
         <div className={styles.gameData}>
           <div className={styles.gameStatus}>
@@ -507,6 +512,7 @@ const GamePage = () => {
           )}
         </div>
       </section>
+      {/* Vote cards */}
       <section className={styles.sizeList}>
         <Card
           className={`${styles.voteCard} ${
