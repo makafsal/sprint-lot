@@ -408,7 +408,7 @@ const GamePage = () => {
     if (state?.game?.type === "confidence" && state?.game?.status === "done") {
       const average = state?.game?.average;
 
-      if (average !== undefined && average >= 0 && average <= 2) {
+      if (average !== undefined && average >= 0 && average < 3) {
         return "🔴 Low";
       } else if (average !== undefined && average >= 3 && average < 4) {
         return "🟡 Moderate";
