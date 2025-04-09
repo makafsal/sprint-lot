@@ -85,3 +85,32 @@
 .checkboxAlt {
   cursor: default;
 }
+
+.scoreboard {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+
+  .scoreboardItem {
+    inline-size: 100%;
+    display: inline-flex;
+
+    .scoreboardPlayer,
+    .scoreboardScore {
+      padding: 1rem;
+      border: 1px solid var(--foreground);
+    }
+
+    .scoreboardPlayer {
+      flex-grow: 1;
+    }
+
+    .scoreboardScore {
+      flex-shrink: 1;
+      border-left: none;
+      background-color: var(--foreground);
+      color: var(--background);
+      border-width: 1px;
+    }
+  }
+}

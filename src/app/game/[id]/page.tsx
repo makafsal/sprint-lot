@@ -87,10 +87,11 @@ const GamePage = () => {
         },
         (payload) => {
           const newPlayer = payload.new as Player;
+
           setPlayers((prevPlayers) =>
             prevPlayers.map((player) =>
               player.id === newPlayer.id
-                ? { ...player, vote: newPlayer.vote }
+                ? { ...player, vote: newPlayer.vote, score: newPlayer?.score }
                 : player
             )
           );
@@ -266,6 +267,14 @@ const GamePage = () => {
     }
   };
 
+  const toggleHasScoreboard = async () => {
+    if (state?.game?.id) {
+      await updateGame(state.game?.id, {
+        has_scoreboard: !state?.game?.has_scoreboard
+      });
+    }
+  };
+
   const reveal = async () => {
     if (state.game?.id && state?.game?.type === "t-shirt") {
       await updateGame(state.game?.id, {
@@ -298,10 +307,51 @@ const GamePage = () => {
         (!Number.isNaN(average) || Number.isFinite(average)) &&
         state.game?.id
       ) {
-        await updateGame(state.game?.id, {
+        const newGame = await updateGame(state.game?.id, {
           average: average,
           status: "done"
         });
+
+        // Update the scoreboard
+        if (newGame && newGame?.has_scoreboard && newGame?.status === "done") {
+          const _scoreboard: Player[] = [];
+          players?.forEach((boardPlayer) => {
+            let myScore = boardPlayer?.score || 0;
+
+            if (
+              newGame?.average !== undefined &&
+              boardPlayer?.vote === Math.round(newGame?.average)
+            ) {
+              myScore += 5;
+            } else if (
+              boardPlayer?.vote &&
+              newGame?.average &&
+              (boardPlayer?.vote + 1 === Math.round(newGame?.average) ||
+                boardPlayer?.vote - 1 === Math.round(newGame?.average))
+            ) {
+              myScore += 2;
+            }
+
+            if (myScore > 0) {
+              _scoreboard?.push({
+                id: boardPlayer.id,
+                score: myScore
+              });
+            }
+          });
+
+          if (_scoreboard?.length) {
+            await Promise.all(
+              _scoreboard?.map(async (scoreItem) => {
+                if (scoreItem?.id) {
+                  await updatePlayerByID(scoreItem.id, {
+                    score: scoreItem?.score
+                  });
+                }
+              })
+            );
+          }
+        }
       }
     }
   };
@@ -420,6 +470,8 @@ const GamePage = () => {
     }
   };
 
+  console.log(players)
+
   return (
     <>
       <DeleteDialog
@@ -492,10 +544,13 @@ const GamePage = () => {
           >
             Exit
           </button>
-          {/* <div>
-            <Checkbox />
+          <div>
+            <Checkbox
+              onToggle={() => toggleHasScoreboard()}
+              checked={state?.game?.has_scoreboard}
+            />
             <label htmlFor="scoreboard"> Enable Scoreboard</label>
-          </div> */}
+          </div>
         </div>
         <div className={styles.gameData}>
           <div className={styles.gameStatus}>
@@ -528,6 +583,34 @@ const GamePage = () => {
         </Card>
         {getGameCards(state?.game?.type)}
       </section>
+      {/* Scoreboard */}
+      {state?.game?.has_scoreboard && (
+        <section className="mt-2">
+          <h3>Scoreboard</h3>
+          <div className={`${styles.scoreboard} mt-1`}>
+            {players
+              ?.sort((a, b) => {
+                const scoreA = a?.score !== undefined ? a.score : 0;
+                const scoreB = b?.score !== undefined ? b.score : 0;
+                return scoreB - scoreA;
+              })
+              .slice(0, 3)
+              ?.map((scoreboardPlayer) => (
+                <div
+                  key={scoreboardPlayer?.id}
+                  className={styles.scoreboardItem}
+                >
+                  <div className={styles.scoreboardPlayer}>
+                    {scoreboardPlayer.name}
+                  </div>
+                  <div className={styles.scoreboardScore}>
+                    {scoreboardPlayer.score}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </section>
+      )}
     </>
   );
 };

@@ -37,6 +37,7 @@ export interface Game {
   owner?: number | null;
   status?: "started" | "in_progress" | "done";
   type?: GameType;
+  has_scoreboard?: boolean;
 }
 
 export interface Player {
@@ -45,6 +46,7 @@ export interface Player {
   id?: number;
   name?: string;
   vote?: number | null;
+  score?: number;
 }
 
 export interface Store {
