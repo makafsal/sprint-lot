@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://sprint-lot.vercel.app/"
+  },
+  verification: {
+    google: "urgH_uFDodlf1IYGOZROMaOY2_w-_1qseiH9o3kTdDc"
   }
 };
 
