@@ -34,6 +34,11 @@ const T_SHIRT = [
 ];
 const CONFIDENCE = [0, 1, 2, 3, 4, 5];
 
+// Score bar
+const SCORE_RANGE_1 = 0.5;
+const SCORE_RANGE_2 = 1;
+const SCORE_RANGE_3 = 1.5;
+
 const GamePage = () => {
   const router = useRouter();
   const [player, setPlayer] = useState<Player>();
@@ -320,15 +325,37 @@ const GamePage = () => {
 
             if (
               newGame?.average !== undefined &&
-              boardPlayer?.vote === Math.round(newGame?.average)
+              boardPlayer?.vote !== null &&
+              boardPlayer?.vote !== undefined &&
+              // boardPlayer?.vote === Math.round(newGame?.average)
+              Math.abs(boardPlayer.vote - average) <= SCORE_RANGE_1
             ) {
+              /**
+               * If vote is +/- 0.5
+               * then score is 5
+               */
               myScore += 5;
             } else if (
-              boardPlayer?.vote &&
-              newGame?.average &&
-              (boardPlayer?.vote + 1 === Math.round(newGame?.average) ||
-                boardPlayer?.vote - 1 === Math.round(newGame?.average))
+              newGame?.average !== undefined &&
+              boardPlayer?.vote !== null &&
+              boardPlayer?.vote !== undefined &&
+              Math.abs(boardPlayer.vote - average) <= SCORE_RANGE_2
             ) {
+              /**
+               * If vote is +/- 1
+               * then score is 3
+               */
+              myScore += 3;
+            } else if (
+              newGame?.average !== undefined &&
+              boardPlayer?.vote !== null &&
+              boardPlayer?.vote !== undefined &&
+              Math.abs(boardPlayer.vote - average) <= SCORE_RANGE_3
+            ) {
+              /**
+               * If vote is +/- 1.5
+               * then score is 2
+               */
               myScore += 2;
             }
 
@@ -470,8 +497,6 @@ const GamePage = () => {
     }
   };
 
-  console.log(players)
-
   return (
     <>
       <DeleteDialog
@@ -548,8 +573,15 @@ const GamePage = () => {
             <Checkbox
               onToggle={() => toggleHasScoreboard()}
               checked={state?.game?.has_scoreboard}
+              className={styles.checkboxThick}
             />
-            <label htmlFor="scoreboard"> Enable Scoreboard</label>
+            <label htmlFor="scoreboard">
+              {" "}
+              Enable Scoreboard
+              <sup>
+                <button className={styles.scoreBoardInfoBtn}>?</button>
+              </sup>
+            </label>
           </div>
         </div>
         <div className={styles.gameData}>

@@ -114,3 +114,14 @@
     }
   }
 }
+
+.checkboxThick {
+  font-weight: 400;
+}
+
+.scoreBoardInfoBtn {
+  padding: 0.05rem 0.25rem;
+  border: none;
+
+  /* &:hover {} */
+}
