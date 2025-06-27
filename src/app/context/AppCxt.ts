@@ -1,8 +1,6 @@
 import { createContext } from "react";
 import { Action, Store, Theme } from "../types";
 
-
-
 export const defaultState: Store = {
   theme:
     ((typeof window !== "undefined" &&

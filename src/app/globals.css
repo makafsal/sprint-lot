@@ -37,6 +37,25 @@ body {
   font-style: normal;
 }
 
+dialog {
+  z-index: 999;
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+td,
+th {
+  text-align: left;
+  padding: 0.5rem;
+}
+
+th {
+  font-weight: 700;
+  border-bottom: 1px solid;
+}
+
 h1,
 h2,
 h3,
@@ -103,6 +122,14 @@ input {
   margin-top: 1rem;
 }
 
+.mt-2 {
+  margin-top: 2rem;
+}
+
 .ml-1 {
   margin-left: 1rem;
+}
+
+.text-align-right {
+  text-align: right;
 }

@@ -21,6 +21,7 @@ import { ExitDialog } from "@/app/components/ExitDialog";
 import { Notification } from "@/app/components/Notification";
 import { DialogProps, Game, GameType, Player } from "@/app/types";
 import { Loader } from "@/app/components/Loader";
+import { ScoreInfoModal } from "@/app/components/ScoreInfoModal";
 
 const FIBONACCI = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
 const T_SHIRT = [
@@ -34,6 +35,11 @@ const T_SHIRT = [
 ];
 const CONFIDENCE = [0, 1, 2, 3, 4, 5];
 
+// Score bar
+const SCORE_RANGE_1 = 0.5;
+const SCORE_RANGE_2 = 1;
+const SCORE_RANGE_3 = 1.5;
+
 const GamePage = () => {
   const router = useRouter();
   const [player, setPlayer] = useState<Player>();
@@ -43,6 +49,7 @@ const GamePage = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
+  const [scoreInfoDialogOpen, setScoreInfoDialogOpen] = useState(false);
   const [notification, setNotification] = useState<DialogProps>({
     open: false
   });
@@ -87,10 +94,11 @@ const GamePage = () => {
         },
         (payload) => {
           const newPlayer = payload.new as Player;
+
           setPlayers((prevPlayers) =>
             prevPlayers.map((player) =>
               player.id === newPlayer.id
-                ? { ...player, vote: newPlayer.vote }
+                ? { ...player, vote: newPlayer.vote, score: newPlayer?.score }
                 : player
             )
           );
@@ -266,6 +274,14 @@ const GamePage = () => {
     }
   };
 
+  const toggleHasScoreboard = async () => {
+    if (state?.game?.id) {
+      await updateGame(state.game?.id, {
+        has_scoreboard: !state?.game?.has_scoreboard
+      });
+    }
+  };
+
   const reveal = async () => {
     if (state.game?.id && state?.game?.type === "t-shirt") {
       await updateGame(state.game?.id, {
@@ -298,10 +314,73 @@ const GamePage = () => {
         (!Number.isNaN(average) || Number.isFinite(average)) &&
         state.game?.id
       ) {
-        await updateGame(state.game?.id, {
+        const newGame = await updateGame(state.game?.id, {
           average: average,
           status: "done"
         });
+
+        // Update the scoreboard
+        if (newGame && newGame?.has_scoreboard && newGame?.status === "done") {
+          const _scoreboard: Player[] = [];
+          players?.forEach((boardPlayer) => {
+            let myScore = boardPlayer?.score || 0;
+
+            if (
+              newGame?.average !== undefined &&
+              boardPlayer?.vote !== null &&
+              boardPlayer?.vote !== undefined &&
+              // boardPlayer?.vote === Math.round(newGame?.average)
+              Math.abs(boardPlayer.vote - average) <= SCORE_RANGE_1
+            ) {
+              /**
+               * If vote is +/- 0.5
+               * then score is 5
+               */
+              myScore += 5;
+            } else if (
+              newGame?.average !== undefined &&
+              boardPlayer?.vote !== null &&
+              boardPlayer?.vote !== undefined &&
+              Math.abs(boardPlayer.vote - average) <= SCORE_RANGE_2
+            ) {
+              /**
+               * If vote is +/- 1
+               * then score is 3
+               */
+              myScore += 3;
+            } else if (
+              newGame?.average !== undefined &&
+              boardPlayer?.vote !== null &&
+              boardPlayer?.vote !== undefined &&
+              Math.abs(boardPlayer.vote - average) <= SCORE_RANGE_3
+            ) {
+              /**
+               * If vote is +/- 1.5
+               * then score is 2
+               */
+              myScore += 2;
+            }
+
+            if (myScore > 0) {
+              _scoreboard?.push({
+                id: boardPlayer.id,
+                score: myScore
+              });
+            }
+          });
+
+          if (_scoreboard?.length) {
+            await Promise.all(
+              _scoreboard?.map(async (scoreItem) => {
+                if (scoreItem?.id) {
+                  await updatePlayerByID(scoreItem.id, {
+                    score: scoreItem?.score
+                  });
+                }
+              })
+            );
+          }
+        }
       }
     }
   };
@@ -434,12 +513,17 @@ const GamePage = () => {
         onYes={() => exit()}
       />
 
+      <ScoreInfoModal
+        open={scoreInfoDialogOpen}
+        onClose={() => setScoreInfoDialogOpen(false)}
+      />
+
       <Notification open={notification.open}>
         {notification.children}
       </Notification>
 
       {loading && <Loader />}
-
+      {/* Players list */}
       <section className={`${styles.playersList}`}>
         {players?.map((_player: Player) => (
           <Card className={styles.playerCard} key={_player.id}>
@@ -462,6 +546,7 @@ const GamePage = () => {
           </Card>
         ))}
       </section>
+      {/* Game controls */}
       <section className={styles.gameBoard}>
         <div className={styles.boardActions}>
           <button
@@ -491,6 +576,25 @@ const GamePage = () => {
           >
             Exit
           </button>
+          <div>
+            <Checkbox
+              onToggle={() => toggleHasScoreboard()}
+              checked={state?.game?.has_scoreboard}
+              className={styles.checkboxThick}
+            />
+            <label htmlFor="scoreboard">
+              {" "}
+              Enable Scoreboard
+              <sup>
+                <button
+                  className={styles.scoreBoardInfoBtn}
+                  onClick={() => setScoreInfoDialogOpen(true)}
+                >
+                  ?
+                </button>
+              </sup>
+            </label>
+          </div>
         </div>
         <div className={styles.gameData}>
           <div className={styles.gameStatus}>
@@ -507,6 +611,7 @@ const GamePage = () => {
           )}
         </div>
       </section>
+      {/* Vote cards */}
       <section className={styles.sizeList}>
         <Card
           className={`${styles.voteCard} ${
@@ -522,6 +627,34 @@ const GamePage = () => {
         </Card>
         {getGameCards(state?.game?.type)}
       </section>
+      {/* Scoreboard */}
+      {state?.game?.has_scoreboard && (
+        <section className="mt-2">
+          <h3>Scoreboard</h3>
+          <div className={`${styles.scoreboard} mt-1`}>
+            {players
+              ?.sort((a, b) => {
+                const scoreA = a?.score !== undefined ? a.score : 0;
+                const scoreB = b?.score !== undefined ? b.score : 0;
+                return scoreB - scoreA;
+              })
+              .slice(0, 3)
+              ?.map((scoreboardPlayer) => (
+                <div
+                  key={scoreboardPlayer?.id}
+                  className={styles.scoreboardItem}
+                >
+                  <div className={styles.scoreboardPlayer}>
+                    {scoreboardPlayer.name}
+                  </div>
+                  <div className={styles.scoreboardScore}>
+                    {scoreboardPlayer.score}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </section>
+      )}
     </>
   );
 };
