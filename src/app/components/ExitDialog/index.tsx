@@ -1,13 +1,26 @@
 import { DialogProps } from "@/app/types";
+import { useEffect, useRef } from "react";
 
+export const ExitDialog = ({ open, onYes, onNo }: DialogProps) => {
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
-export const ExitDialog = (prop: DialogProps) => {
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (open && !dialog.open) {
+      dialog.showModal(); // ensures backdrop
+    } else if (!open && dialog.open) {
+      dialog.close();
+    }
+  }, [open]);
+
   return (
-    <dialog open={prop.open}>
+    <dialog ref={dialogRef}>
       <p>Do you want to exit from this game?</p>
       <div className="mt-1">
-        <button onClick={prop.onYes}>Yes</button>
-        <button onClick={prop.onNo}>No</button>
+        <button onClick={onYes}>Yes</button>
+        <button onClick={onNo}>No</button>
       </div>
     </dialog>
   );

@@ -21,6 +21,7 @@ import { ExitDialog } from "@/app/components/ExitDialog";
 import { Notification } from "@/app/components/Notification";
 import { DialogProps, Game, GameType, Player } from "@/app/types";
 import { Loader } from "@/app/components/Loader";
+import { ScoreInfoModal } from "@/app/components/ScoreInfoModal";
 
 const FIBONACCI = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
 const T_SHIRT = [
@@ -48,6 +49,7 @@ const GamePage = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
+  const [scoreInfoDialogOpen, setScoreInfoDialogOpen] = useState(false);
   const [notification, setNotification] = useState<DialogProps>({
     open: false
   });
@@ -511,6 +513,11 @@ const GamePage = () => {
         onYes={() => exit()}
       />
 
+      <ScoreInfoModal
+        open={scoreInfoDialogOpen}
+        onClose={() => setScoreInfoDialogOpen(false)}
+      />
+
       <Notification open={notification.open}>
         {notification.children}
       </Notification>
@@ -579,7 +586,12 @@ const GamePage = () => {
               {" "}
               Enable Scoreboard
               <sup>
-                <button className={styles.scoreBoardInfoBtn}>?</button>
+                <button
+                  className={styles.scoreBoardInfoBtn}
+                  onClick={() => setScoreInfoDialogOpen(true)}
+                >
+                  ?
+                </button>
               </sup>
             </label>
           </div>
