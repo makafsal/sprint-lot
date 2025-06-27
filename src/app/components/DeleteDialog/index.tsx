@@ -20,10 +20,10 @@ export const DeleteDialog = ({ open, onYes, onNo }: DialogProps) => {
       <p>Do you want to delete this game?</p>
       <br />
       <small>Warning: All other players will lose access to it.</small>
-      <div className="mt-1">
+      <footer className="mt-1 text-align-right">
         <button onClick={onYes}>Yes</button>
         <button onClick={onNo}>No</button>
-      </div>
+      </footer>
     </dialog>
   );
 };
