@@ -18,10 +18,10 @@ export const ExitDialog = ({ open, onYes, onNo }: DialogProps) => {
   return (
     <dialog ref={dialogRef}>
       <p>Do you want to exit from this game?</p>
-      <div className="mt-1">
+      <footer className="mt-1 text-align-right">
         <button onClick={onYes}>Yes</button>
         <button onClick={onNo}>No</button>
-      </div>
+      </footer>
     </dialog>
   );
 };

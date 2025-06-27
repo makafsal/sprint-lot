@@ -576,25 +576,27 @@ const GamePage = () => {
           >
             Exit
           </button>
-          <div>
-            <Checkbox
-              onToggle={() => toggleHasScoreboard()}
-              checked={state?.game?.has_scoreboard}
-              className={styles.checkboxThick}
-            />
-            <label htmlFor="scoreboard">
-              {" "}
-              Enable Scoreboard
-              <sup>
-                <button
-                  className={styles.scoreBoardInfoBtn}
-                  onClick={() => setScoreInfoDialogOpen(true)}
-                >
-                  ?
-                </button>
-              </sup>
-            </label>
-          </div>
+          {state?.game?.type !== "t-shirt" && (
+            <div>
+              <Checkbox
+                onToggle={() => toggleHasScoreboard()}
+                checked={state?.game?.has_scoreboard}
+                className={styles.checkboxThick}
+              />
+              <label htmlFor="scoreboard">
+                {" "}
+                Enable Scoreboard
+                <sup>
+                  <button
+                    className={styles.scoreBoardInfoBtn}
+                    onClick={() => setScoreInfoDialogOpen(true)}
+                  >
+                    ?
+                  </button>
+                </sup>
+              </label>
+            </div>
+          )}
         </div>
         <div className={styles.gameData}>
           <div className={styles.gameStatus}>
