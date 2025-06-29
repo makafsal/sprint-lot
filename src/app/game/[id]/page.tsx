@@ -23,7 +23,7 @@ import { DialogProps, Game, GameType, Player } from "@/app/types";
 import { Loader } from "@/app/components/Loader";
 import { ScoreInfoModal } from "@/app/components/ScoreInfoModal";
 
-const FIBONACCI = [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
+const FIBONACCI = [0, 1, 2, 3, 5, 8, 13];
 const T_SHIRT = [
   { text: "XXS", value: 1 },
   { text: "XS", value: 2 },
