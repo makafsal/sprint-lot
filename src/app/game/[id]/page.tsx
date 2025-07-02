@@ -35,11 +35,6 @@ const T_SHIRT = [
 ];
 const CONFIDENCE = [0, 1, 2, 3, 4, 5];
 
-// Score bar
-const SCORE_RANGE_1 = 0.5;
-const SCORE_RANGE_2 = 1;
-const SCORE_RANGE_3 = 1.5;
-
 const GamePage = () => {
   const router = useRouter();
   const [player, setPlayer] = useState<Player>();
@@ -282,6 +277,34 @@ const GamePage = () => {
     }
   };
 
+  const getFibIndex = (value: number): number => {
+    return FIBONACCI.indexOf(value);
+  };
+
+  const getScoreFromVote = (vote: number, average: number): number => {
+    const avgRounded = findClosestFib(average);
+    const voteIndex = getFibIndex(vote);
+    const avgIndex = getFibIndex(avgRounded);
+
+    if (voteIndex === -1 || avgIndex === -1) {
+      console.warn("Vote or average not in Fibonacci scale:", vote, avgRounded);
+      return 0;
+    }
+
+    const distance = Math.abs(voteIndex - avgIndex);
+
+    if (distance === 0) return 5;
+    if (distance === 1) return 3;
+    if (distance === 2) return 2;
+    return 0;
+  };
+
+  const findClosestFib = (value: number): number => {
+    return FIBONACCI.reduce((prev, curr) =>
+      Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev
+    );
+  };
+
   const reveal = async () => {
     if (state.game?.id && state?.game?.type === "t-shirt") {
       await updateGame(state.game?.id, {
@@ -328,37 +351,9 @@ const GamePage = () => {
             if (
               newGame?.average !== undefined &&
               boardPlayer?.vote !== null &&
-              boardPlayer?.vote !== undefined &&
-              // boardPlayer?.vote === Math.round(newGame?.average)
-              Math.abs(boardPlayer.vote - average) <= SCORE_RANGE_1
+              boardPlayer?.vote !== undefined
             ) {
-              /**
-               * If vote is +/- 0.5
-               * then score is 5
-               */
-              myScore += 5;
-            } else if (
-              newGame?.average !== undefined &&
-              boardPlayer?.vote !== null &&
-              boardPlayer?.vote !== undefined &&
-              Math.abs(boardPlayer.vote - average) <= SCORE_RANGE_2
-            ) {
-              /**
-               * If vote is +/- 1
-               * then score is 3
-               */
-              myScore += 3;
-            } else if (
-              newGame?.average !== undefined &&
-              boardPlayer?.vote !== null &&
-              boardPlayer?.vote !== undefined &&
-              Math.abs(boardPlayer.vote - average) <= SCORE_RANGE_3
-            ) {
-              /**
-               * If vote is +/- 1.5
-               * then score is 2
-               */
-              myScore += 2;
+              myScore += getScoreFromVote(boardPlayer.vote, average);
             }
 
             if (myScore > 0) {
