@@ -404,15 +404,17 @@ export const FacilitatorView = () => {
             <thead>
               <tr>
                 <td colSpan={3}>
-                  <div className={styles.averageDisplay}>
-                    <div>Average</div>
-                    <div>
-                      {state.game?.average === -1
-                        ? "?"
-                        : state.game?.average?.toFixed(2)}{" "}
-                      {getConfidenceIndicator(state.game)}
+                  {state?.game?.type !== "t-shirt" && (
+                    <div className={styles.averageDisplay}>
+                      <div>Average</div>
+                      <div>
+                        {state.game?.average === -1
+                          ? "?"
+                          : state.game?.average?.toFixed(2)}{" "}
+                        {getConfidenceIndicator(state.game)}
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className={styles.gameControls}>
                     <div>
                       <button
