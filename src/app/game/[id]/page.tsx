@@ -395,6 +395,7 @@ const GamePage = () => {
               key={size.value}
               onClick={() => castVote(size.value)}
               disabled={state.game?.status === "done"}
+              hint={getHint(state.game?.type, size.text)}
             >
               <CardBody className={styles.cardBodyAlt}>
                 <div className={styles.cardContent}>{size.text}</div>
