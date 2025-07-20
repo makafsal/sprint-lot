@@ -55,3 +55,9 @@ export interface Store {
 }
 
 export type Action = { type: "TOGGLE_THEME" | "UPDATE_GAME"; payload?: Store };
+
+export interface Ticket {
+  url: string;
+  id?: number;
+  gameId?: number;
+}

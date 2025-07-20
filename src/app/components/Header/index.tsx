@@ -4,9 +4,11 @@ import { useContext, useEffect, useState } from "react";
 import "./header.css";
 import { AppCxt } from "@/app/context/AppCxt";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { Player } from "@/app/types";
 
 export const Header = () => {
   const [isClient, setIsClient] = useState(false);
+  const [user, setUser] = useState<Player | null>(null);
   const { state, dispatch } = useContext(AppCxt);
   const pathname = usePathname();
   const router = useRouter();
@@ -23,6 +25,13 @@ export const Header = () => {
     setIsClient(true);
   }, []);
 
+  useEffect(() => {
+    const storedPlayer = localStorage.getItem("player");
+    const player = JSON.parse(storedPlayer || "{}");
+
+    setUser(player);
+  }, [state.game]);
+
   const getPageTitle = () => {
     if (pathname === "/") {
       return "";
@@ -31,13 +40,44 @@ export const Header = () => {
     }
   };
 
-  const getButton = () => {
+  const getFormButton = () => {
     if (pathname?.toString()?.includes("/game/")) {
       return;
     } else if (formType === "join") {
       return <button onClick={() => handleSetForm("create")}>Create</button>;
-    } else {
+    } else if (pathname !== "/facilitator") {
       return <button onClick={() => handleSetForm("join")}>Join</button>;
+    }
+  };
+
+  const getGameButton = () => {
+    if (
+      isClient &&
+      state.game?.owner === user?.id &&
+      pathname !== "/" &&
+      pathname !== "/facilitator"
+    ) {
+      return (
+        <a
+          className="btn"
+          href={`/facilitator?gameId=${state.game?.game_id}`}
+          target="_blank"
+        >
+          Facilitator
+        </a>
+      );
+    }
+
+    if (isClient && pathname === "/facilitator") {
+      return (
+        <a
+          className="btn"
+          href={`/game/${state.game?.game_id}`}
+          target="_blank"
+        >
+          Back to game
+        </a>
+      );
     }
   };
 
@@ -53,7 +93,8 @@ export const Header = () => {
         >
           {isClient && state.theme === "dark" ? "[☀️]" : "[🌙]"}
         </button>
-        {getButton()}
+        {getGameButton()}
+        {getFormButton()}
       </menu>
     </header>
   );
