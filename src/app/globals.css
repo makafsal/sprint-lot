@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --shade: #555555;
 }
 
 /* Default Dark Theme */
@@ -15,6 +16,7 @@
 [data-theme="light"] {
   --background: #ffffff;
   --foreground: #171717;
+  --shade: #e5e5e5;
 }
 
 html,
@@ -65,27 +67,37 @@ h6 {
   font-weight: 700;
 }
 
+.btn,
 button {
   background: var(--background);
   color: var(--foreground);
   border: 1px solid var(--foreground);
   padding: 0.5rem 0.5rem;
   cursor: pointer;
+  text-decoration: none;
 }
 
+.btn:disabled,
 button:disabled {
   cursor: default;
   opacity: 0.5;
 }
 
+.btn:disabled:hover,
 button:disabled:hover {
   background: inherit;
   color: inherit;
 }
 
+.btn:hover,
 button:hover {
   background: var(--foreground);
   color: var(--background);
+}
+
+button.inline {
+  padding: 0.05rem 0.25rem;
+  border: none;
 }
 
 main {
@@ -132,4 +144,12 @@ input {
 
 .text-align-right {
   text-align: right;
+}
+
+.d-inline-block {
+  display: inline-block;
+}
+
+.d-flex {
+  display: flex;
 }

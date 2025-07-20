@@ -22,25 +22,16 @@ import { Notification } from "@/app/components/Notification";
 import { DialogProps, Game, GameType, Player } from "@/app/types";
 import { Loader } from "@/app/components/Loader";
 import { ScoreInfoModal } from "@/app/components/ScoreInfoModal";
-
-const FIBONACCI = [0, 1, 2, 3, 5, 8, 13];
-const T_SHIRT = [
-  { text: "XXS", value: 1 },
-  { text: "XS", value: 2 },
-  { text: "S", value: 3 },
-  { text: "M", value: 4 },
-  { text: "L", value: 5 },
-  { text: "XL", value: 6 },
-  { text: "XXL", value: 7 }
-];
-const CONFIDENCE = [0, 1, 2, 3, 4, 5];
+import { getConfidenceIndicator } from "@/app/utils/getConfidenceIndicator";
+import { CONFIDENCE, FIBONACCI, T_SHIRT } from "@/app/constants";
+import { displayVote } from "@/app/utils/displayVote";
+import { getScoreFromVote } from "@/app/utils/getScoreFromVote";
 
 const GamePage = () => {
   const router = useRouter();
   const [player, setPlayer] = useState<Player>();
   const { state, dispatch } = useContext(AppCxt);
   const { id: gameID } = useParams();
-
   const [players, setPlayers] = useState<Player[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [exitDialogOpen, setExitDialogOpen] = useState(false);
@@ -277,34 +268,6 @@ const GamePage = () => {
     }
   };
 
-  const getFibIndex = (value: number): number => {
-    return FIBONACCI.indexOf(value);
-  };
-
-  const getScoreFromVote = (vote: number, average: number): number => {
-    const avgRounded = findClosestFib(average);
-    const voteIndex = getFibIndex(vote);
-    const avgIndex = getFibIndex(avgRounded);
-
-    if (voteIndex === -1 || avgIndex === -1) {
-      console.warn("Vote or average not in Fibonacci scale:", vote, avgRounded);
-      return 0;
-    }
-
-    const distance = Math.abs(voteIndex - avgIndex);
-
-    if (distance === 0) return 5;
-    if (distance === 1) return 3;
-    if (distance === 2) return 2;
-    return 0;
-  };
-
-  const findClosestFib = (value: number): number => {
-    return FIBONACCI.reduce((prev, curr) =>
-      Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev
-    );
-  };
-
   const reveal = async () => {
     if (state.game?.id && state?.game?.type === "t-shirt") {
       await updateGame(state.game?.id, {
@@ -462,38 +425,6 @@ const GamePage = () => {
     }
   };
 
-  const displayVote = (player: Player) => {
-    if (state?.game?.type === "t-shirt") {
-      return T_SHIRT?.find((size) => size.value === player?.vote)?.text || "🤔";
-    } else {
-      if (
-        player?.vote !== null &&
-        player?.vote !== undefined &&
-        player?.vote >= 0
-      ) {
-        return player?.vote;
-      } else {
-        return "🤔";
-      }
-    }
-  };
-
-  const getConfidenceIndicator = () => {
-    if (state?.game?.type === "confidence" && state?.game?.status === "done") {
-      const average = state?.game?.average;
-
-      if (average !== undefined && average >= 0 && average < 3) {
-        return "🔴 Low";
-      } else if (average !== undefined && average >= 3 && average < 4) {
-        return "🟡 Moderate";
-      } else if (average !== undefined && average >= 4) {
-        return "🟢 High";
-      } else {
-        return "🤔 Uncertain";
-      }
-    }
-  };
-
   return (
     <>
       <DeleteDialog
@@ -528,7 +459,7 @@ const GamePage = () => {
             <CardBody className={styles.cardBodyAlt}>
               <div className={styles.cardContent}>
                 {state.game?.status === "done" ? (
-                  <>{displayVote(_player)}</>
+                  <>{displayVote(_player, state.game)}</>
                 ) : (
                   <Checkbox
                     className={styles.checkboxAlt}
@@ -560,17 +491,11 @@ const GamePage = () => {
           {state.game?.owner === player?.id && (
             <button onClick={() => setDeleteDialogOpen(true)}>Delete</button>
           )}
-          <button
-            disabled={state.game?.owner === player?.id}
-            title={
-              state.game?.owner === player?.id
-                ? "As the owner, you cannot exit this game, but you can delete it."
-                : "Exit"
-            }
-            onClick={() => setExitDialogOpen(true)}
-          >
-            Exit
-          </button>
+          {state.game?.owner !== player?.id && (
+            <button title="Exit" onClick={() => setExitDialogOpen(true)}>
+              Exit
+            </button>
+          )}
           {state?.game?.type !== "t-shirt" && (
             <div>
               <Checkbox
@@ -583,7 +508,7 @@ const GamePage = () => {
                 Enable Scoreboard
                 <sup>
                   <button
-                    className={styles.scoreBoardInfoBtn}
+                    className='inline'
                     onClick={() => setScoreInfoDialogOpen(true)}
                   >
                     ?
@@ -603,7 +528,7 @@ const GamePage = () => {
               {state.game?.average === -1
                 ? "?"
                 : state.game?.average?.toFixed(2)}{" "}
-              {getConfidenceIndicator()}
+              {getConfidenceIndicator(state.game)}
             </h3>
           )}
         </div>
@@ -627,7 +552,7 @@ const GamePage = () => {
       {/* Scoreboard */}
       {state?.game?.has_scoreboard && (
         <section className="mt-2">
-          <h3>Scoreboard</h3>
+          <h3>Scoreboard (🏆 Top 3)</h3>
           <div className={`${styles.scoreboard} mt-1`}>
             {players
               ?.sort((a, b) => {
