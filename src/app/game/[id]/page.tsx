@@ -26,6 +26,7 @@ import { getConfidenceIndicator } from "@/app/utils/getConfidenceIndicator";
 import { CONFIDENCE, FIBONACCI, T_SHIRT } from "@/app/constants";
 import { displayVote } from "@/app/utils/displayVote";
 import { getScoreFromVote } from "@/app/utils/getScoreFromVote";
+import { getHint } from "@/app/utils/getHint";
 
 const GamePage = () => {
   const router = useRouter();
@@ -414,6 +415,7 @@ const GamePage = () => {
               key={size}
               onClick={() => castVote(size)}
               disabled={state.game?.status === "done"}
+              hint={getHint(state.game?.type, size)}
             >
               <CardBody className={styles.cardBodyAlt}>
                 <div className={styles.cardContent}>{size}</div>
@@ -508,7 +510,7 @@ const GamePage = () => {
                 Enable Scoreboard
                 <sup>
                   <button
-                    className='inline'
+                    className="inline"
                     onClick={() => setScoreInfoDialogOpen(true)}
                   >
                     ?
@@ -542,6 +544,7 @@ const GamePage = () => {
           key={"🤔"}
           onClick={() => castVote(-1)}
           disabled={state.game?.status === "done"}
+          hint="I don't know"
         >
           <CardBody className={styles.cardBodyAlt}>
             <div className={styles.cardContent}>🤔</div>

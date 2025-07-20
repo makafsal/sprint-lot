@@ -5,6 +5,7 @@ export interface CardProps extends PropsWithChildren {
   onClick?: () => void;
   selected?: boolean;
   disabled?: boolean;
+  hint?: string;
 }
 
 export interface CheckboxProps {
