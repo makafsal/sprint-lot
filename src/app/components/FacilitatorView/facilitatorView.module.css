@@ -11,23 +11,23 @@
   overflow: auto;
   flex-direction: column;
 
-  table {
+  & table {
     border: 1px solid;
     width: 100%;
     border-spacing: 0px;
 
-    thead {
+    & thead {
       position: sticky;
       top: 0;
       background-color: var(--background);
     }
 
-    th {
+    & th {
       border-top: 1px solid;
       padding: 1rem;
     }
 
-    td {
+    & td {
       padding: 0.75rem 1rem;
       border-bottom: solid var(--shade);
     }
@@ -39,11 +39,11 @@
     align-items: center;
     margin-top: 1rem;
 
-    * {
+    & * {
       font-weight: 700;
     }
 
-    :last-child {
+    & :last-child {
       font-size: 2.5rem;
     }
   }
@@ -73,17 +73,17 @@
     display: flex;
     align-items: center;
 
-    a {
+    & a {
       color: var(--foreground);
       flex-grow: 1;
     }
 
-    button {
+    & button {
       opacity: 0;
     }
 
     &:hover {
-      button {
+      & button {
         opacity: 1;
       }
     }
@@ -97,11 +97,11 @@
     .itemInput {
       flex-grow: 1;
 
-      input {
+      & input {
         width: 100%;
       }
 
-      p {
+      & p {
         font-size: 0.75rem;
         margin-top: 0.5rem;
       }
