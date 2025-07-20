@@ -53,9 +53,12 @@ export interface Player {
 export interface Store {
   theme?: Theme;
   game?: Game;
+  sound?: boolean;
 }
 
-export type Action = { type: "TOGGLE_THEME" | "UPDATE_GAME"; payload?: Store };
+type ActionType = "TOGGLE_THEME" | "UPDATE_GAME" | "TOGGLE_SOUND";
+
+export type Action = { type: ActionType; payload?: Store };
 
 export interface Ticket {
   url: string;

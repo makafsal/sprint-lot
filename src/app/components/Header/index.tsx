@@ -5,6 +5,7 @@ import "./header.css";
 import { AppCxt } from "@/app/context/AppCxt";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Player } from "@/app/types";
+import { playBeep, playLightSwitch } from "@/app/utils/sounds";
 
 export const Header = () => {
   const [isClient, setIsClient] = useState(false);
@@ -16,6 +17,7 @@ export const Header = () => {
   const formType = searchParams.get("type") || "create";
 
   const toggleTheme = () => dispatch({ type: "TOGGLE_THEME" });
+  const toggleSound = () => dispatch({ type: "TOGGLE_SOUND" });
 
   const handleSetForm = (type: "create" | "join") => {
     router.push(`?type=${type}`, { scroll: false }); // Update URL without reload
@@ -86,12 +88,28 @@ export const Header = () => {
       <h1>{getPageTitle()}</h1>
       <menu>
         <button
-          onClick={toggleTheme}
+          onClick={() => {
+            if (state.sound) {
+              playLightSwitch();
+            }
+            toggleTheme();
+          }}
           title={`${
             isClient && state.theme === "dark" ? "Light" : "Dark"
           } mode`}
         >
           {isClient && state.theme === "dark" ? "[☀️]" : "[🌙]"}
+        </button>
+        <button
+          onClick={() => {
+            if (!state.sound) {
+              playBeep();
+            }
+            toggleSound();
+          }}
+          title={`Sound ${isClient && state.sound ? "off" : "on"}`}
+        >
+          {isClient && state.sound ? "[🔊]" : "[🔇]"}
         </button>
         {getGameButton()}
         {getFormButton()}
