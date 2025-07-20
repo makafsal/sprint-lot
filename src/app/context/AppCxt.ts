@@ -4,7 +4,8 @@ import { Action, Store, Theme } from "../types";
 export const defaultState: Store = {
   theme:
     ((typeof window !== "undefined" &&
-      localStorage.getItem("theme")) as Theme) || "light"
+      localStorage.getItem("theme")) as Theme) || "light",
+  sound: true
 };
 
 export const AppCxt = createContext<{
@@ -30,6 +31,12 @@ export const appReducer = (state: Store, action: Action): Store => {
       return {
         ...state,
         game: action.payload?.game
+      };
+
+    case "TOGGLE_SOUND":
+      return {
+        ...state,
+        sound: !state?.sound
       };
 
     default:

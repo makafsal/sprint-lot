@@ -27,6 +27,14 @@ import { CONFIDENCE, FIBONACCI, T_SHIRT } from "@/app/constants";
 import { displayVote } from "@/app/utils/displayVote";
 import { getScoreFromVote } from "@/app/utils/getScoreFromVote";
 import { getHint } from "@/app/utils/getHint";
+import {
+  playBell,
+  playCardFlip,
+  playError,
+  playLightSwitch,
+  playSelectClick,
+  playSuccess
+} from "@/app/utils/sounds";
 
 const GamePage = () => {
   const router = useRouter();
@@ -234,6 +242,9 @@ const GamePage = () => {
             count === players?.length &&
             sessionStorage?.getItem("ready_to_reveal") !== "Yes"
           ) {
+            if (state.sound) {
+              playBell();
+            }
             setNotification({ open: true, children: "Ready to reveal! 🤠" });
             sessionStorage?.setItem("ready_to_reveal", "Yes");
 
@@ -247,9 +258,13 @@ const GamePage = () => {
     } else if (sessionStorage?.getItem("ready_to_reveal")) {
       sessionStorage?.removeItem("ready_to_reveal");
     }
-  }, [players, state?.game?.status, state?.game?.type]);
+  }, [players, state?.game?.status, state?.game?.type, state.sound]);
 
   const castVote = async (size: number) => {
+    if (state.sound) {
+      playSelectClick();
+    }
+
     if (player?.id) {
       await updatePlayerByID(player.id, { vote: size });
       if (state?.game?.status === "started" && state.game?.id) {
@@ -270,6 +285,10 @@ const GamePage = () => {
   };
 
   const reveal = async () => {
+    if (state.sound) {
+      playSuccess();
+    }
+
     if (state.game?.id && state?.game?.type === "t-shirt") {
       await updateGame(state.game?.id, {
         status: "done"
@@ -349,6 +368,10 @@ const GamePage = () => {
       await updateAllPlayersByGameID(state.game?.id, { vote: null });
       await updateGame(state.game?.id, { status: "started", average: 0 });
     }
+
+    if (state.sound) {
+      playCardFlip();
+    }
   };
 
   const deleteGame = async () => {
@@ -366,6 +389,10 @@ const GamePage = () => {
 
   const invite = async () => {
     await navigator.clipboard.writeText(window?.location?.href);
+
+    if (state.sound) {
+      playLightSwitch();
+    }
 
     setNotification({ open: true, children: "Invite URL copied! 📋" });
 
@@ -492,10 +519,27 @@ const GamePage = () => {
           </button>
           <button onClick={() => invite()}>Invite</button>
           {state.game?.owner === player?.id && (
-            <button onClick={() => setDeleteDialogOpen(true)}>Delete</button>
+            <button
+              onClick={() => {
+                if (state.sound) {
+                  playError();
+                }
+                setDeleteDialogOpen(true);
+              }}
+            >
+              Delete
+            </button>
           )}
           {state.game?.owner !== player?.id && (
-            <button title="Exit" onClick={() => setExitDialogOpen(true)}>
+            <button
+              title="Exit"
+              onClick={() => {
+                if (state.sound) {
+                  playError();
+                }
+                setExitDialogOpen(true);
+              }}
+            >
               Exit
             </button>
           )}
