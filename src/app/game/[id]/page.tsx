@@ -600,7 +600,7 @@ const GamePage = () => {
       {/* Scoreboard */}
       {state?.game?.has_scoreboard && (
         <section className="mt-2">
-          <h3>Scoreboard (🏆 Top 3)</h3>
+          <h3>🏆 Scoreboard</h3>
           <div className={`${styles.scoreboard} mt-1`}>
             {players
               ?.sort((a, b) => {
@@ -608,7 +608,6 @@ const GamePage = () => {
                 const scoreB = b?.score !== undefined ? b.score : 0;
                 return scoreB - scoreA;
               })
-              .slice(0, 3)
               ?.map((scoreboardPlayer) => (
                 <div
                   key={scoreboardPlayer?.id}
