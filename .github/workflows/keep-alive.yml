@@ -2,17 +2,28 @@ name: Supabase Keep Alive
 
 on:
   schedule:
-    - cron: "0 0 * * *" # Twice a week
+    - cron: "0 0 * * 1,4"  # Every Monday and Thursday at midnight UTC
   workflow_dispatch:
 
 jobs:
   keepalive:
     runs-on: ubuntu-latest
     steps:
-      - name: Keep Supabase alive
+      - name: Check and restore Supabase project
         run: |
-          curl -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/keepalive" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{"note": "Ping on '"$(date -u)"'"}'
+          STATUS=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ACCESS_TOKEN }}" \
+            https://api.supabase.com/v1/projects/lotocusvwmnzkewdrtrg \
+            | jq -r '.status')
+
+          echo "Project status: $STATUS"
+
+          if [ "$STATUS" = "INACTIVE" ] || [ "$STATUS" = "PAUSED" ]; then
+            echo "Project is paused! Restoring..."
+            curl -s -X POST \
+              -H "Authorization: Bearer ${{ secrets.SUPABASE_ACCESS_TOKEN }}" \
+              https://api.supabase.com/v1/projects/lotocusvwmnzkewdrtrg/restore
+            echo "Restore triggered."
+          else
+            echo "Project is healthy. No action needed."
+          fi
